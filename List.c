@@ -440,7 +440,13 @@ void delete (List L)
   L->index = -1;
   L->cursor = NULL;
 }
-
+// set()
+// Overwrites the cursor element with x.
+//Pre: length()>0, index()>=0
+void set(List L, long x)
+{
+  L->cursor->data = x;
+}
 // Other operations -----------------------------------------------------------
 // PrintList()
 // Prints to the file pointed to by out, a

@@ -54,6 +54,8 @@ void insertBefore(List L, long data); // Insert new element before cursor.
                                      // Pre: length()>0, index()>=0
 void insertAfter(List L, long data);  // Insert new element after cursor.
                                      // Pre: length()>0, index()>=0
+void set(List L, long x);   // Overwrites the cursor element with x.
+                            //Pre: length()>0, index()>=0           
 void deleteFront(List L); // Delete the front element. Pre: length()>0
 void deleteBack(List L);  // Delete the back element. Pre: length()>0
 void delete (List L);     // Delete cursor element, making cursor undefined.

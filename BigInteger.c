@@ -4,16 +4,18 @@
 # PA3                                                                         #
 *******************************************************************************/
 //-----------------------------------------------------------------------------
-// Biginteger.h
-// Header file for BigInt ADT
+// Biginteger.c
+// Implementation file for BigInt ADT
 //-----------------------------------------------------------------------------
-
-#ifndef _BIGINT_H_INCLUDE_
-#define _BIGINT_H_INCLUDE_
 #include <stdio.h>
-// Exported type -------------------------------------------------------------
-// BigInteger reference type
-typedef struct BigIntegerObj* BigInteger;
+// structs --------------------------------------------------------------------
+// private BigIntegerObj type
+typedef struct BigIntegerObj
+{
+  List mag;
+  int sign;
+} BigIntegerObj;
+
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
 // Returns a reference to a new BigInteger object in the zero state.
@@ -32,6 +34,7 @@ int compare(BigInteger A, BigInteger B);
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
 int equals(BigInteger A, BigInteger B);
+
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
 // Re-sets N to the zero state.
@@ -76,4 +79,5 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N);
 
-#endif
+
+
