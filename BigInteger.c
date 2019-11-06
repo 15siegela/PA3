@@ -7,6 +7,8 @@
 // Biginteger.c
 // Implementation file for BigInt ADT
 //-----------------------------------------------------------------------------
+#define BASE 1000000000
+#define POWER 9
 #include <stdio.h>
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
@@ -15,7 +17,8 @@ typedef struct BigIntegerObj
   List mag;
   int sign;
 } BigIntegerObj;
-
+//Helper Functions
+void normalize(BigInteger);
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
 // Returns a reference to a new BigInteger object in the zero state.
@@ -34,7 +37,6 @@ int compare(BigInteger A, BigInteger B);
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
 int equals(BigInteger A, BigInteger B);
-
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
 // Re-sets N to the zero state.
