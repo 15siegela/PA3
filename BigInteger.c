@@ -113,14 +113,77 @@ BigInteger copy(BigInteger N)
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
-void add(BigInteger S, BigInteger A, BigInteger B);
+void add(BigInteger S, BigInteger A, BigInteger B)
+{
+    moveFront(A->mag);
+    moveFront(B->mag);
+    clear(S);
+    while(index(A->mag) > -1 || index(A->mag) > -1)
+    {
+         if (index(B->mag) == -1)
+            {
+                while (index(A->mag) > -1)
+                {
+                    append(S->mag, get(A->mag));
+                    moveNext(A->mag);
+                }
+                continue;
+            }
+            if (index(a->mag) == -1)
+            {
+                while (index(B->mag > -1)
+                {
+                    append(S->mag, get(B->mag);
+                    moveNext(B->mag);
+                }
+                continue;
+            }
+        append(S,  (get(A->mag)  +  get(B->mag)));
+        moveNext(A->mag);
+        moveNext(B->mag);
+    }
+}
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.
-BigInteger sum(BigInteger A, BigInteger B);
+BigInteger sum(BigInteger A, BigInteger B)
+{
+    temp = newBigInteger();
+    add(temp, A, B);
+    return temp;
+}
 // subtract()
 // Places the difference of A and B in the existing BigInteger D, overwriting
 // its current state: D = A - B
-void subtract(BigInteger D, BigInteger A, BigInteger B);
+void subtract(BigInteger D, BigInteger A, BigInteger B)
+{
+    moveFront(A->mag);
+    moveFront(B->mag);
+    clear(S);
+    while(index(A->mag) > -1 || index(A->mag) > -1)
+    {
+         if (index(B->mag) == -1)
+            {
+                while (index(A->mag) > -1)
+                {
+                    append(S->mag, get(A->mag));
+                    moveNext(A->mag);
+                }
+                continue;
+            }
+            if (index(a->mag) == -1)
+            {
+                while (index(B->mag > -1)
+                {
+                    append(S->mag, -1 *get(B->mag);
+                    moveNext(B->mag);
+                }
+                continue;
+            }
+        append(S,  (get(A->mag)  -  get(B->mag)));
+        moveNext(A->mag);
+        moveNext(B->mag);
+    }
+}
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
 BigInteger diff(BigInteger A, BigInteger B);
