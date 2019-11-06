@@ -22,39 +22,94 @@ void normalize(BigInteger);
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
 // Returns a reference to a new BigInteger object in the zero state.
-BigInteger newBigInteger();
+BigInteger newBigInteger()
+{
+    BigInteger B = malloc(sizeof(BigIntegerObj));
+    B->mag = newList();
+    B->sign = 0;
+    return B;
+}
 // freeBigInteger()
 // Frees heap memory associated with *pN, sets *pN to NULL.
-void freeBigInteger(BigInteger* pN);
+void freeBigInteger(BigInteger* pN)
+{
+    if (*pN)
+    {
+        freeList(&pN->mag);
+        free(*pN);
+        *pN = NULL; 
+    }
+}
 // Access functions -----------------------------------------------------------
 // sign()
 // Returns -1 if N is negative, 1 if N is positive, and 0 if N is in the zero
 // state.
-int sign(BigInteger N);
+int sign(BigInteger N)
+{
+    if (N->sign == 0)
+    {
+        return 0;
+    }
+    else if (N->sign > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
+}
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
-int compare(BigInteger A, BigInteger B);
+int compare(BigInteger A, BigInteger B)
+{
+    return 0;
+}
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
-int equals(BigInteger A, BigInteger B);
+int equals(BigInteger A, BigInteger B)
+{
+    return 0;
+}
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
 // Re-sets N to the zero state.
-void makeZero(BigInteger N);
+void makeZero(BigInteger N)
+{
+    clear(N->mag);
+    N->sign = 0;
+}
 // negate()
 // Reverses the sign of N: positive <--> negative. Does nothing if N is in the
 // zero state.
-void negate(BigInteger N);
+void negate(BigInteger N)
+{
+    N->sign *= -1;
+}
 // BigInteger Arithmetic operations -----------------------------------------------
 // stringToBigInteger()
 // Returns a reference to a new BigInteger object representing the decimal integer
 // represented in base 10 by the string s.
 // Pre: s is a non-empty string containing only base ten digits {0,1,2,3,4,5,6,7,8,9}
 // and an optional sign {+, -} prefix.
-BigInteger stringToBigInteger(char* s);
+BigInteger stringToBigInteger(char* s)
+{
+    if(!s)
+    {
+        fprintf(stderr, "BigInteger Error: calling stringToBigInteger on null string");
+        exit(EXIT_FAILURE);
+    }
+     BigInteger temp = newBigInteger();
+     return temp;
+}
 // copy()
 // Returns a reference to a new BigInteger object in the same state as N.
-BigInteger copy(BigInteger N);
+BigInteger copy(BigInteger N)
+{
+    BigInteger temp = newBigInteger();
+    temp->mag = copyList(N);
+    temp->sign = N->sign;
+}
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
