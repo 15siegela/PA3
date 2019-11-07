@@ -117,46 +117,59 @@ BigInteger stringToBigInteger(char* s)
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on null string");
         exit(EXIT_FAILURE);
     }
-     BigInteger temp = newBigInteger();
+    BigInteger temp = newBigInteger();
     
-     int sLen = strlen(s);
-     printf("String(sign): %s\n", s);
-     char* uS[sLen]; 
-     if(s[0] == '-')
-     {
+    int sLen = strlen(s);
+    //printf("String(sign): %s\n", s);
+    char* uS[sLen]; 
+    if(s[0] == '-')
+    {
         temp->sign = -1;
         strcpy(uS, s + 1);
-     }
-     else if(s[0] == '+')
-     {
+    }
+    else if(s[0] == '+')
+    {
         temp->sign = 1;
         strcpy(uS, s + 1);
-     }
-     else if(isdigit(s[0]))
-     {
+    }
+    else if(isdigit(s[0]))
+    {
         temp->sign = 1;
-         strcpy(uS, s);
-     }
-     else
-     { 
+        strcpy(uS, s);
+    }
+    else
+    { 
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
         exit(EXIT_FAILURE);
-     }
-     printf("String(no sign): %s\n", uS);
-     printf("Sign : %d", temp->sign);
-     sLen = strlen(uS);
-     long entry;
-     int rem = sLen;
-     long ret;
-     char *ptr;
-     if(sLen < POWER)
+    }
+    //printf("String(no sign): %s\n", uS);
+    //printf("Sign : %d\n", temp->sign);
+    sLen = strlen(uS);
+    int rem = sLen;
+    long ret;
+    char * ptr;
+    char entry[POWER + 1];
+    if(sLen < POWER)
     {
         ret = strtol(uS, &ptr, 10);
-        printf("\nLong: %ld\n\n", ret);
         append(temp->mag, ret);
         return temp;
     }
-     
+    for (int i = 0; sLen > POWER; i++)
+    {   
+        strcpy(entry, uS + (i * POWER));
+        entry[POWER] = '\n';
+        ret = strtol(entry, &ptr, 10);
+        append(temp->mag, ret);
+        sLen-= POWER;
+        if(sLen < POWER)
+        {
+            
+        }
+    }
+
+    printList(stdout, temp->mag);
+    return temp;
 }
 // copy()
 // Returns a reference to a new BigInteger object in the same state as N.
