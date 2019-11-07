@@ -7,9 +7,12 @@
 // Biginteger.c
 // Implementation file for BigInt ADT
 //-----------------------------------------------------------------------------
+#include "BigInteger.h"
+#include "List.h"
+#include <stdio.h>
 #define BASE 1000000000
 #define POWER 9
-#include <stdio.h>
+
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
 typedef struct BigIntegerObj
@@ -35,7 +38,7 @@ void freeBigInteger(BigInteger* pN)
 {
     if (*pN)
     {
-        freeList(&pN->mag);
+        freeList((*pN)->mag);
         free(*pN);
         *pN = NULL; 
     }
@@ -63,13 +66,26 @@ int sign(BigInteger N)
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B)
 {
-    return 0;
+    
+
 }
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
 int equals(BigInteger A, BigInteger B)
 {
-    return 0;
+    if ( A->sign != B->sign)
+    {
+        return 0;
+    }
+    if(length(A->mag) != length(B->mag))
+    {
+        return 0;
+    }
+    
+    {
+
+    }
+
 }
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
@@ -186,7 +202,10 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
-BigInteger diff(BigInteger A, BigInteger B);
+BigInteger diff(BigInteger A, BigInteger B)
+{
+
+}
 // multiply()
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B

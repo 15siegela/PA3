@@ -493,5 +493,6 @@ List concatList(List A, List B)
   {
     append(C, b->cursor->data);
   }
+  C->length = a->length + b->length;
   return C;
 }
