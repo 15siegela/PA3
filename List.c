@@ -106,7 +106,7 @@ int index(List L) { return (L == NULL ? -1 : L->index); }
 // front()
 // returns front element of L
 // Pre: length()>0
-int front(List L)
+long front(List L)
 {
   if (length(L) <= 0)
   {
@@ -118,7 +118,7 @@ int front(List L)
 // back()
 // returns back element of L
 // Pre: length()>0
-int back(List L)
+long back(List L)
 {
   if (length(L) <= 0)
   {
@@ -130,7 +130,7 @@ int back(List L)
 // get()
 // Returns cursor element of L.
 // Pre: length()>0, index()>=0
-int get(List L)
+long get(List L)
 {
   if (length(L) <= 0)
   {
@@ -144,15 +144,15 @@ int get(List L)
   }
   return L->cursor->data;
 }
-// equals()
+// listEquals()
 // Returns true (1) iff Lists A and B are in same
 // state, and returns false (0) otherwise.
-int equals(List A, List B)
+int listEquals(List A, List B)
 {
   
   if (A == NULL || B == NULL)
   {
-    fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
+    fprintf(stderr, "List Error: calling listEquals() on NULL List reference\n");
     exit(1);
   }
   List C = A;
@@ -456,7 +456,7 @@ void printList(FILE *out, List L)
   List A = L;
   for (moveFront(A); A->cursor; moveNext(L))
   {
-    fprintf(out, "%d ", get(A));
+    fprintf(out, "%ld ", get(A));
   }
 }
 // copyList()

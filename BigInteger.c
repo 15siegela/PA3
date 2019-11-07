@@ -9,7 +9,10 @@
 //-----------------------------------------------------------------------------
 #include "BigInteger.h"
 #include "List.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 #define BASE 1000000000
 #define POWER 9
 
@@ -49,25 +52,24 @@ void freeBigInteger(BigInteger* pN)
 // state.
 int sign(BigInteger N)
 {
-    if (N->sign == 0)
-    {
-        return 0;
-    }
-    else if (N->sign > 0)
-    {
-        return 1;
-    }
-    else
-    {
-        return -1;
-    }
+   return N->sign;
 }
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B)
 {
-    
-
+    if(sign(A) > sign(B))
+    {
+        return 1;
+    }
+    if(sign(A) < sign(B))
+    {
+        return -1;
+    }
+    if((sign(A) == sign(B)) == 0)
+    {
+        return 0;
+    }
 }
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
@@ -81,11 +83,11 @@ int equals(BigInteger A, BigInteger B)
     {
         return 0;
     }
-    
+    if(A->sign != B->sign)
     {
-
+        return 0;
     }
-
+   return listEquals(A->mag, B->mag);
 }
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
@@ -116,7 +118,45 @@ BigInteger stringToBigInteger(char* s)
         exit(EXIT_FAILURE);
     }
      BigInteger temp = newBigInteger();
-     return temp;
+    
+     int sLen = strlen(s);
+     printf("String(sign): %s\n", s);
+     char* uS[sLen]; 
+     if(s[0] == '-')
+     {
+        temp->sign = -1;
+        strcpy(uS, s + 1);
+     }
+     else if(s[0] == '+')
+     {
+        temp->sign = 1;
+        strcpy(uS, s + 1);
+     }
+     else if(isdigit(s[0]))
+     {
+        temp->sign = 1;
+         strcpy(uS, s);
+     }
+     else
+     { 
+        fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
+        exit(EXIT_FAILURE);
+     }
+     printf("String(no sign): %s\n", uS);
+     printf("Sign : %d", temp->sign);
+     sLen = strlen(uS);
+     long entry;
+     int rem = sLen;
+     long ret;
+     char *ptr;
+     if(sLen < POWER)
+    {
+        ret = strtol(uS, &ptr, 10);
+        printf("\nLong: %ld\n\n", ret);
+        append(temp->mag, ret);
+        return temp;
+    }
+     
 }
 // copy()
 // Returns a reference to a new BigInteger object in the same state as N.
@@ -145,16 +185,16 @@ void add(BigInteger S, BigInteger A, BigInteger B)
                 }
                 continue;
             }
-            if (index(a->mag) == -1)
+            if (index(A->mag) == -1)
             {
-                while (index(B->mag > -1)
+                while (index(B->mag) > -1)
                 {
-                    append(S->mag, get(B->mag);
+                    append(S->mag, get(B->mag));
                     moveNext(B->mag);
                 }
                 continue;
             }
-        append(S,  (get(A->mag)  +  get(B->mag)));
+        append(S,  (get(A->mag))  +  (get(B->mag)));
         moveNext(A->mag);
         moveNext(B->mag);
     }
@@ -163,7 +203,7 @@ void add(BigInteger S, BigInteger A, BigInteger B)
 // Returns a reference to a new BigInteger object representing A + B.
 BigInteger sum(BigInteger A, BigInteger B)
 {
-    temp = newBigInteger();
+    BigInteger temp = newBigInteger();
     add(temp, A, B);
     return temp;
 }
@@ -174,28 +214,28 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     moveFront(A->mag);
     moveFront(B->mag);
-    clear(S);
+    clear(D);
     while(index(A->mag) > -1 || index(A->mag) > -1)
     {
          if (index(B->mag) == -1)
             {
                 while (index(A->mag) > -1)
                 {
-                    append(S->mag, get(A->mag));
+                    append(D->mag, get(A->mag));
                     moveNext(A->mag);
                 }
                 continue;
             }
-            if (index(a->mag) == -1)
+            if (index(A->mag) == -1)
             {
-                while (index(B->mag > -1)
+                while (index(B->mag) > -1)
                 {
-                    append(S->mag, -1 *get(B->mag);
+                    append(D->mag, (-1 *get(B->mag)));
                     moveNext(B->mag);
                 }
                 continue;
             }
-        append(S,  (get(A->mag)  -  get(B->mag)));
+        append(D,  (get(A->mag)  -  get(B->mag)));
         moveNext(A->mag);
         moveNext(B->mag);
     }
