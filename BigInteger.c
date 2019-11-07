@@ -155,17 +155,14 @@ BigInteger stringToBigInteger(char* s)
         append(temp->mag, ret);
         return temp;
     }
-    for (int i = 0; sLen > POWER; i++)
+    int loc = 0;
+    while (loc < sLen)
     {   
-        strcpy(entry, uS + (i * POWER));
+        strncpy(entry, uS[loc], POWER);
         entry[POWER] = '\n';
         ret = strtol(entry, &ptr, 10);
         append(temp->mag, ret);
-        sLen-= POWER;
-        if(sLen < POWER)
-        {
-            
-        }
+        loc += POWER;
     }
 
     printList(stdout, temp->mag);
