@@ -456,7 +456,7 @@ void printList(FILE *out, List L)
   List A = L;
   for (moveFront(A); A->cursor; moveNext(L))
   {
-    fprintf(out, "%ld ", get(A));
+    fprintf(out, "%ld", get(A));
   }
 }
 // copyList()

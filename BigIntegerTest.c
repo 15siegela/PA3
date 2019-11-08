@@ -2,6 +2,11 @@
 
 int main()
 {
-    char * string = "+12345678911";
-    stringToBigInteger(string);
+    char * string = "+1234567899876543211234567891";
+    BigInteger a = stringToBigInteger(string);
+    BigInteger b = stringToBigInteger(string);
+
+    BigInteger C = sum(a,b);
+    printBigInteger(stdout, C);
+    
 }

@@ -118,10 +118,8 @@ BigInteger stringToBigInteger(char* s)
         exit(EXIT_FAILURE);
     }
     BigInteger temp = newBigInteger();
-    
     int sLen = strlen(s);
-    //printf("String(sign): %s\n", s);
-    char* uS[sLen]; 
+    char uS[sLen]; 
     if(s[0] == '-')
     {
         temp->sign = -1;
@@ -141,31 +139,24 @@ BigInteger stringToBigInteger(char* s)
     { 
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
         exit(EXIT_FAILURE);
-    }
-    //printf("String(no sign): %s\n", uS);
-    //printf("Sign : %d\n", temp->sign);
-    sLen = strlen(uS);
-    int rem = sLen;
-    long ret;
-    char * ptr;
-    char entry[POWER + 1];
-    if(sLen < POWER)
+    }    
+    /*if(sLen < POWER)
     {
         ret = strtol(uS, &ptr, 10);
         append(temp->mag, ret);
         return temp;
-    }
-    int loc = 0;
-    while (loc < sLen)
+    }*/ 
+    sLen = strlen(uS);
+    long ret;
+    int index = 0;
+    while (index < sLen)
     {   
-        strncpy(entry, uS[loc], POWER);
-        entry[POWER] = '\n';
-        ret = strtol(entry, &ptr, 10);
+        char entry[POWER];
+        memcpy(entry, uS+index, POWER);
+        ret = strtol(entry, NULL, 10);
         append(temp->mag, ret);
-        loc += POWER;
+        index += POWER;   
     }
-
-    printList(stdout, temp->mag);
     return temp;
 }
 // copy()
@@ -184,7 +175,7 @@ void add(BigInteger S, BigInteger A, BigInteger B)
     moveFront(A->mag);
     moveFront(B->mag);
     clear(S);
-    while(index(A->mag) > -1 || index(A->mag) > -1)
+    while(index(A->mag) > -1 || index(B->mag) > -1)
     {
          if (index(B->mag) == -1)
             {
@@ -192,8 +183,9 @@ void add(BigInteger S, BigInteger A, BigInteger B)
                 {
                     append(S->mag, get(A->mag));
                     moveNext(A->mag);
+                    printBigInteger(stdout, S);
                 }
-                continue;
+                break;
             }
             if (index(A->mag) == -1)
             {
@@ -201,12 +193,14 @@ void add(BigInteger S, BigInteger A, BigInteger B)
                 {
                     append(S->mag, get(B->mag));
                     moveNext(B->mag);
+                    printBigInteger(stdout, S);
                 }
-                continue;
+                break;
             }
         append(S,  (get(A->mag))  +  (get(B->mag)));
         moveNext(A->mag);
         moveNext(B->mag);
+        printBigInteger(stdout, S);
     }
 }
 // sum()
@@ -254,7 +248,9 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 // Returns a reference to a new BigInteger object representing A - B.
 BigInteger diff(BigInteger A, BigInteger B)
 {
-
+    BigInteger temp = newBigInteger();
+    subtract(temp, A, B);
+    return temp;
 }
 // multiply()
 // Places the product of A and B in the existing BigInteger P, overwriting
@@ -266,7 +262,11 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Other operations -----------------------------------------------------------
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
-void printBigInteger(FILE* out, BigInteger N);
+void printBigInteger(FILE* out, BigInteger N)
+{
+    printList(out, N->mag);
+    printf("\n");
+}
 
 
 
