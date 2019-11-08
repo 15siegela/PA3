@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#define BASE 1000000000
-#define POWER 9
+#define BASE 1000
+#define POWER 3
 
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
@@ -24,7 +24,26 @@ typedef struct BigIntegerObj
     int sign;
 } BigIntegerObj;
 //Helper Functions
-void normalize(BigInteger);
+void normalize(BigInteger A)
+{
+    List* L = A->mag;
+    if(length(L) == 0)
+    {
+        return;
+    }
+    moveBack(L);
+    int carry = 0;
+    while(index(L) > 0)
+    {
+        if(get(L) < 0)
+        {
+            set(L, BASE + get(L));
+            carry = 1;
+            movePrev(L);
+            set(L, get(L) - 1);
+        }
+    }
+}
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
 // Returns a reference to a new BigInteger object in the zero state.
@@ -172,8 +191,8 @@ void add(BigInteger S, BigInteger A, BigInteger B)
     {
         same = 1;
     }
-    moveFront(A->mag);
-    moveFront(B->mag);
+    moveBack(A->mag);
+    moveBack(B->mag);
     if(S == A || S == B)
     {
         S = newBigInteger();
@@ -189,8 +208,8 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         {
             while (index(A->mag) > -1)
             {
-                append(S->mag, get(A->mag));
-                moveNext(A->mag);
+                prepend(S->mag, get(A->mag));
+                movePrev(A->mag);
             }
             break;
         }
@@ -198,16 +217,16 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         {
             while (index(B->mag) > -1)
             {
-                append(S->mag, get(B->mag));
-                moveNext(B->mag);
+                prepend(S->mag, get(B->mag));
+                movePrev(B->mag);
             }
             break;
         }
-        append(S->mag, (get(A->mag) + get(B->mag)));
-        moveNext(A->mag);
+        prepend(S->mag, (get(A->mag) + get(B->mag)));
+        movePrev(A->mag);
         if (!same)
         {
-            moveNext(B->mag);
+            movePrev(B->mag);
         }
     }
 }
@@ -224,8 +243,8 @@ BigInteger sum(BigInteger A, BigInteger B)
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
-    moveFront(A->mag);
-    moveFront(B->mag);
+    moveBack(A->mag);
+    moveBack(B->mag);
     int same = 0;
     if(A==B)
     {
@@ -245,8 +264,8 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         {
             while (index(A->mag) > -1)
             {
-                append(D->mag, get(A->mag));
-                moveNext(A->mag);
+                prepend(D->mag, get(A->mag));
+                movePrev(A->mag);
             }
             continue;
         }
@@ -254,18 +273,19 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         {
             while (index(B->mag) > -1)
             {
-                append(D->mag, (-1 * get(B->mag)));
-                moveNext(B->mag);
+                prepend(D->mag, (-1 * get(B->mag)));
+                movePrev(B->mag);
             }
             continue;
         }
-        append(D->mag, (get(A->mag) - get(B->mag)));
-        moveNext(A->mag);
+        prepend(D->mag, (get(A->mag) - get(B->mag)));
+        movePrev(A->mag);
         if (!same)
         {
-            moveNext(B->mag);
+            movePrev(B->mag);
         }
     }
+    normalize(D);
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
