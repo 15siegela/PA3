@@ -20,8 +20,8 @@
 // private BigIntegerObj type
 typedef struct BigIntegerObj
 {
-  List mag;
-  int sign;
+    List mag;
+    int sign;
 } BigIntegerObj;
 //Helper Functions
 void normalize(BigInteger);
@@ -37,13 +37,13 @@ BigInteger newBigInteger()
 }
 // freeBigInteger()
 // Frees heap memory associated with *pN, sets *pN to NULL.
-void freeBigInteger(BigInteger* pN)
+void freeBigInteger(BigInteger *pN)
 {
     if (*pN)
     {
         freeList((*pN)->mag);
         free(*pN);
-        *pN = NULL; 
+        *pN = NULL;
     }
 }
 // Access functions -----------------------------------------------------------
@@ -52,21 +52,21 @@ void freeBigInteger(BigInteger* pN)
 // state.
 int sign(BigInteger N)
 {
-   return N->sign;
+    return N->sign;
 }
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B)
 {
-    if(sign(A) > sign(B))
+    if (sign(A) > sign(B))
     {
         return 1;
     }
-    if(sign(A) < sign(B))
+    if (sign(A) < sign(B))
     {
         return -1;
     }
-    if((sign(A) == sign(B)) == 0)
+    if ((sign(A) == sign(B)) == 0)
     {
         return 0;
     }
@@ -75,19 +75,19 @@ int compare(BigInteger A, BigInteger B)
 // Return true (1) if A and B are equal, false (0) otherwise.
 int equals(BigInteger A, BigInteger B)
 {
-    if ( A->sign != B->sign)
+    if (A->sign != B->sign)
     {
         return 0;
     }
-    if(length(A->mag) != length(B->mag))
+    if (length(A->mag) != length(B->mag))
     {
         return 0;
     }
-    if(A->sign != B->sign)
+    if (A->sign != B->sign)
     {
         return 0;
     }
-   return listEquals(A->mag, B->mag);
+    return listEquals(A->mag, B->mag);
 }
 // Manipulation procedures ----------------------------------------------------
 // makeZero()
@@ -110,52 +110,46 @@ void negate(BigInteger N)
 // represented in base 10 by the string s.
 // Pre: s is a non-empty string containing only base ten digits {0,1,2,3,4,5,6,7,8,9}
 // and an optional sign {+, -} prefix.
-BigInteger stringToBigInteger(char* s)
+BigInteger stringToBigInteger(char *s)
 {
-    if(!s)
+    if (!s)
     {
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on null string");
         exit(EXIT_FAILURE);
     }
     BigInteger temp = newBigInteger();
     int sLen = strlen(s);
-    char uS[sLen]; 
-    if(s[0] == '-')
+    char uS[sLen];
+    if (s[0] == '-')
     {
         temp->sign = -1;
         strcpy(uS, s + 1);
     }
-    else if(s[0] == '+')
+    else if (s[0] == '+')
     {
         temp->sign = 1;
         strcpy(uS, s + 1);
     }
-    else if(isdigit(s[0]))
+    else if (isdigit(s[0]))
     {
         temp->sign = 1;
         strcpy(uS, s);
     }
     else
-    { 
+    {
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
         exit(EXIT_FAILURE);
-    }    
-    /*if(sLen < POWER)
-    {
-        ret = strtol(uS, &ptr, 10);
-        append(temp->mag, ret);
-        return temp;
-    }*/ 
+    }
     sLen = strlen(uS);
     long ret;
     int index = 0;
     while (index < sLen)
-    {   
+    {
         char entry[POWER];
-        memcpy(entry, uS+index, POWER);
+        memcpy(entry, uS + index, POWER);
         ret = strtol(entry, NULL, 10);
         append(temp->mag, ret);
-        index += POWER;   
+        index += POWER;
     }
     return temp;
 }
@@ -172,35 +166,48 @@ BigInteger copy(BigInteger N)
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
+    int same = 0;
+    if(A==B)
+    {
+        same = 1;
+    }
     moveFront(A->mag);
     moveFront(B->mag);
-    clear(S);
-    while(index(A->mag) > -1 || index(B->mag) > -1)
+    if(S == A || S == B)
     {
-         if (index(B->mag) == -1)
+        S = newBigInteger();
+    }
+    else if(length(S->mag) > 0)
+    {
+        clear(S->mag);
+    }
+    while (index(A->mag) > -1 || index(B->mag) > -1)
+    {
+       
+        if (index(B->mag) == -1)
+        {
+            while (index(A->mag) > -1)
             {
-                while (index(A->mag) > -1)
-                {
-                    append(S->mag, get(A->mag));
-                    moveNext(A->mag);
-                    printBigInteger(stdout, S);
-                }
-                break;
+                append(S->mag, get(A->mag));
+                moveNext(A->mag);
             }
-            if (index(A->mag) == -1)
+            break;
+        }
+        if (index(A->mag) == -1)
+        {
+            while (index(B->mag) > -1)
             {
-                while (index(B->mag) > -1)
-                {
-                    append(S->mag, get(B->mag));
-                    moveNext(B->mag);
-                    printBigInteger(stdout, S);
-                }
-                break;
+                append(S->mag, get(B->mag));
+                moveNext(B->mag);
             }
-        append(S,  (get(A->mag))  +  (get(B->mag)));
+            break;
+        }
+        append(S->mag, (get(A->mag) + get(B->mag)));
         moveNext(A->mag);
-        moveNext(B->mag);
-        printBigInteger(stdout, S);
+        if (!same)
+        {
+            moveNext(B->mag);
+        }
     }
 }
 // sum()
@@ -218,30 +225,45 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     moveFront(A->mag);
     moveFront(B->mag);
-    clear(D);
-    while(index(A->mag) > -1 || index(A->mag) > -1)
+    int same = 0;
+    if(A==B)
     {
-         if (index(B->mag) == -1)
+        same = 1;
+    }
+    if(D==A || D==B)
+    {
+        D = newBigInteger();
+    }
+    else if(length(D->mag) > 0)
+    {
+        clear(D->mag);
+    }
+    while (index(A->mag) > -1 || index(A->mag) > -1)
+    {
+        if (index(B->mag) == -1)
+        {
+            while (index(A->mag) > -1)
             {
-                while (index(A->mag) > -1)
-                {
-                    append(D->mag, get(A->mag));
-                    moveNext(A->mag);
-                }
-                continue;
+                append(D->mag, get(A->mag));
+                moveNext(A->mag);
             }
-            if (index(A->mag) == -1)
+            continue;
+        }
+        if (index(A->mag) == -1)
+        {
+            while (index(B->mag) > -1)
             {
-                while (index(B->mag) > -1)
-                {
-                    append(D->mag, (-1 *get(B->mag)));
-                    moveNext(B->mag);
-                }
-                continue;
+                append(D->mag, (-1 * get(B->mag)));
+                moveNext(B->mag);
             }
-        append(D,  (get(A->mag)  -  get(B->mag)));
+            continue;
+        }
+        append(D->mag, (get(A->mag) - get(B->mag)));
         moveNext(A->mag);
-        moveNext(B->mag);
+        if (!same)
+        {
+            moveNext(B->mag);
+        }
     }
 }
 // diff()
@@ -262,11 +284,8 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Other operations -----------------------------------------------------------
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
-void printBigInteger(FILE* out, BigInteger N)
+void printBigInteger(FILE *out, BigInteger N)
 {
     printList(out, N->mag);
     printf("\n");
 }
-
-
-

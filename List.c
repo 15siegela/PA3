@@ -175,8 +175,8 @@ void clear(List L)
   {
     moveFront(L);
     delete (L);
+    //printf("Length: %d\n", length(L));
   }
-  L->front = L->back = L->cursor = NULL;
   L->length = 0;
   L->index = -1;
 }
