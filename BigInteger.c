@@ -39,9 +39,10 @@ BigInteger newBigInteger()
 // Frees heap memory associated with *pN, sets *pN to NULL.
 void freeBigInteger(BigInteger *pN)
 {
+    BigInteger a = pN;
     if (*pN)
     {
-        freeList((*pN)->mag);
+        freeList(a->mag);
         free(*pN);
         *pN = NULL;
     }

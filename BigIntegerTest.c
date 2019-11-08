@@ -9,5 +9,7 @@ int main()
     printBigInteger(stdout, suma);
     subtract(suma, a, a);
     printBigInteger(stdout, suma);
+    freeBigInteger(&a);
+    freeBigInteger(&suma);
     return 0;
 }
