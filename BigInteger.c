@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#define BASE 1000000000
-#define POWER 9
+#define BASE 1000
+#define POWER 3
 
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
@@ -24,37 +24,38 @@ typedef struct BigIntegerObj
     int sign;
 } BigIntegerObj;
 //Helper Functions
+void removeLeadZeros(BigInteger A)
+{
+    moveFront(A->mag);
+    while (index(A->mag) > -1)
+    {
+        if (get(A->mag) == 0)
+        {
+            deleteFront(A->mag);
+        }
+        else
+        {
+            return;
+        }
+    }
+    A->sign = 0;
+}
 void normalize(BigInteger A)
 {
+    removeLeadZeros(A);
     List L = A->mag;
     if (length(L) == 0)
     {
         return;
     }
     moveBack(L);
-    if(index(L) == -1)
+    if (index(L) == -1)
     {
         A->sign = 0;
         return;
     }
-    int eq = 1;
-    if(length(L))
-    {
-        for(moveFront(L); index(L) != -1; moveNext(L))
-        {
-            if (get(L) == 0)
-            {
-                eq = 0;
-                break;
-            }
-        }
-        if (!eq)
-        {
-            clear(L);
-            A->sign = 0;
-            return;
-        }
-    }
+    int eq = 0;
+ 
     while (index(L) > 0)
     {
         if (get(L) < 0)
@@ -76,16 +77,16 @@ void normalize(BigInteger A)
         }
         movePrev(L);
     }
-    if(index(L) == 0)
+    if (index(L) == 0)
     {
         if (get(L) < 0)
         {
             negate(A);
-            set(L, (get(L)*-1));
+            set(L, (get(L) * -1));
         }
     }
-
 }
+
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
 // Returns a reference to a new BigInteger object in the zero state.
@@ -132,7 +133,21 @@ int compare(BigInteger A, BigInteger B)
     {
         return 0;
     }
-    return 0;
+    if (length(A->mag) > length(B->mag))
+    {
+        return 1;
+    }
+    if (length(A->mag) > length(B->mag))
+    {
+        return 1;
+    }
+    for (moveFront(A->mag), moveFront(B->mag); index(A->mag) != -1; moveNext(A->mag), moveNext(B->mag))
+    {
+        if (get(A->mag) > get(B->mag))
+        {
+            return 1;
+        }
+    }
 }
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
@@ -206,15 +221,14 @@ BigInteger stringToBigInteger(char *s)
     sLen = strlen(uS);
     long ret;
     int index = sLen;
-    if(sLen <= POWER)
+    if (sLen <= POWER)
     {
-        char entry[sLen];
-        memcpy(entry, uS, sLen);
-        ret = strtol(entry, NULL, 10);
+        ret = strtol(uS, NULL, 10);
         prepend(temp->mag, ret);
+        removeLeadZeros(temp);
         return temp;
     }
-   
+
     while (index > 0)
     {
         char entry[POWER - 1];
@@ -231,6 +245,7 @@ BigInteger stringToBigInteger(char *s)
             break;
         }
     }
+    removeLeadZeros(temp);
     return temp;
 }
 // copy()
@@ -249,8 +264,9 @@ BigInteger copy(BigInteger N)
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
     int aBsame = 0;
+    int resSign = 1;
     int srcDestSame = 0;
-    if(sign(A) == 0 || sign(B) == 0) //zero check
+    if (sign(A) == 0 || sign(B) == 0) //zero check
     {
         if (sign(A) != 0)
         {
@@ -262,7 +278,11 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         {
             S = copy(B);
             return;
-        }  
+        }
+    }
+    if (A->sign == -1 && B->sign == -1) //A is negative
+    {
+        resSign = -1; // S = -( B + A)
     }
     if (A == B) //check if A and B are the same object
     {
@@ -273,7 +293,7 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         S = newBigInteger();
         srcDestSame = 1;
     }
-    else if(S == B)
+    else if (S == B) //create new big int if required
     {
         S = newBigInteger();
         srcDestSame = -1;
@@ -282,7 +302,7 @@ void add(BigInteger S, BigInteger A, BigInteger B)
     {
         clear(S->mag);
     }
-    S->sign = 1;
+    S->sign = resSign;
     moveBack(A->mag);
     moveBack(B->mag);
     while (index(A->mag) > -1 || index(B->mag) > -1)
@@ -312,10 +332,11 @@ void add(BigInteger S, BigInteger A, BigInteger B)
             movePrev(B->mag);
         }
     }
+
     normalize(S);
-   
+
     if (srcDestSame) //handle dest = src
-    {   
+    {
         if (srcDestSame > 0)
         {
             freeBigInteger(&A);
@@ -323,9 +344,9 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         }
         else
         {
-           freeBigInteger(&B);
-           B = copy(S);
-        }      
+            freeBigInteger(&B);
+            B = copy(S);
+        }
     }
 }
 // sum()
@@ -343,7 +364,7 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     int same = 0;
     int srcDestSame = 0;
-    if(sign(A) == 0 || sign(B) == 0) //zero check
+    if (sign(A) == 0 || sign(B) == 0) //zero check
     {
         if (sign(A) != 0)
         {
@@ -354,7 +375,7 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         {
             D = copy(B);
             return;
-        }  
+        }
     }
     if (A == B) //src1 = src2
     {
@@ -366,7 +387,7 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         D = newBigInteger();
         srcDestSame = 1;
     }
-    else if(D == B) //Dest = src2
+    else if (D == B) //Dest = src2
     {
         D = newBigInteger();
         srcDestSame = -1;
@@ -416,7 +437,7 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         {
             freeBigInteger(&B);
             B = copy(D);
-        }      
+        }
     }
 }
 // diff()
@@ -439,22 +460,26 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE *out, BigInteger N)
 {
-    if(sign(N) == 0)
+    if (sign(N) == 0)
     {
         fprintf(out, "0");
         return;
+    }
+    if (sign(N) == -1)
+    {
+        fprintf(out, "-");
     }
     for (moveFront(N->mag); index(N->mag) > -1; moveNext(N->mag))
     {
         if (index(N->mag) != 0)
         {
-            fprintf(out, "%0*ld ", POWER, get(N->mag));
+            fprintf(out, "[%0*ld] ", POWER, get(N->mag));
         }
         else
         {
-            fprintf(out, "%ld ", get(N->mag));
-        } 
+            fprintf(out, "[%ld] ", get(N->mag));
+        }
     }
-    
+
     fprintf(out, "\n");
 }

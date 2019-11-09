@@ -2,8 +2,8 @@
 
 int main()
 {
-    char* string = "+9000";
-    char* string2 = "-400";
+    char* string = "-9400";
+    char* string2 = "-4000";
     BigInteger a = stringToBigInteger(string);
     BigInteger a2 = stringToBigInteger(string2);
 
@@ -33,6 +33,9 @@ int main()
     add(a, a, a2);
     printBigInteger(stdout, a);
     printf("\n______________________\n");
+
+    a = stringToBigInteger(string);
+    a2 = stringToBigInteger(string2);
 
     //simple subtract
     subtract(suma, a, a2);
