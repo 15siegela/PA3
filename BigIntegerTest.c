@@ -3,7 +3,7 @@
 int main()
 {
     char* string = "-9400";
-    char* string2 = "-4000";
+    char* string2 = "4000";
     BigInteger a = stringToBigInteger(string);
     BigInteger a2 = stringToBigInteger(string2);
 
