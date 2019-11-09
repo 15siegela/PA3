@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#define BASE 1000
-#define POWER 3
+#define BASE 1000000000
+#define POWER 9
 
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
@@ -26,23 +26,65 @@ typedef struct BigIntegerObj
 //Helper Functions
 void normalize(BigInteger A)
 {
-    List* L = A->mag;
-    if(length(L) == 0)
+    List L = A->mag;
+    if (length(L) == 0)
     {
         return;
     }
     moveBack(L);
-    int carry = 0;
-    while(index(L) > 0)
+    if(index(L) == -1)
     {
-        if(get(L) < 0)
+        A->sign = 0;
+        return;
+    }
+    int eq = 1;
+    if(length(L))
+    {
+        for(moveFront(L); index(L) != -1; moveNext(L))
+        {
+            if (get(L) == 0)
+            {
+                eq = 0;
+                break;
+            }
+        }
+        if (!eq)
+        {
+            clear(L);
+            A->sign = 0;
+            return;
+        }
+    }
+    while (index(L) > 0)
+    {
+        if (get(L) < 0)
         {
             set(L, BASE + get(L));
-            carry = 1;
             movePrev(L);
             set(L, get(L) - 1);
         }
+        movePrev(L);
     }
+    moveBack(L);
+    while (index(L) > 0)
+    {
+        if (get(L) >= BASE)
+        {
+            set(L, get(L) - BASE);
+            movePrev(L);
+            set(L, get(L) + 1);
+        }
+        movePrev(L);
+    }
+    if(index(L) == 0)
+    {
+        if (get(L) < 0)
+        {
+            negate(A);
+            set(L, (get(L)*-1));
+        }
+    }
+
 }
 // Constructors-Destructors ---------------------------------------------------
 // newBigInteger()
@@ -58,10 +100,10 @@ BigInteger newBigInteger()
 // Frees heap memory associated with *pN, sets *pN to NULL.
 void freeBigInteger(BigInteger *pN)
 {
-    BigInteger a = pN;
+    BigInteger a = *pN;
     if (*pN)
     {
-        freeList(a->mag);
+        freeList(&(a->mag));
         free(*pN);
         *pN = NULL;
     }
@@ -90,6 +132,7 @@ int compare(BigInteger A, BigInteger B)
     {
         return 0;
     }
+    return 0;
 }
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
@@ -122,7 +165,7 @@ void makeZero(BigInteger N)
 // zero state.
 void negate(BigInteger N)
 {
-    N->sign *= -1;
+    N->sign = sign(N) * -1;
 }
 // BigInteger Arithmetic operations -----------------------------------------------
 // stringToBigInteger()
@@ -162,14 +205,31 @@ BigInteger stringToBigInteger(char *s)
     }
     sLen = strlen(uS);
     long ret;
-    int index = 0;
-    while (index < sLen)
+    int index = sLen;
+    if(sLen <= POWER)
     {
-        char entry[POWER];
-        memcpy(entry, uS + index, POWER);
+        char entry[sLen];
+        memcpy(entry, uS, sLen);
         ret = strtol(entry, NULL, 10);
-        append(temp->mag, ret);
-        index += POWER;
+        prepend(temp->mag, ret);
+        return temp;
+    }
+   
+    while (index > 0)
+    {
+        char entry[POWER - 1];
+        memcpy(entry, uS + index - POWER, POWER);
+        ret = strtol(entry, NULL, 10);
+        prepend(temp->mag, ret);
+        index -= POWER;
+        if (index < POWER)
+        {
+            char entry2[index];
+            memcpy(entry2, uS, index);
+            ret = strtol(entry2, NULL, 10);
+            prepend(temp->mag, ret);
+            break;
+        }
     }
     return temp;
 }
@@ -178,32 +238,55 @@ BigInteger stringToBigInteger(char *s)
 BigInteger copy(BigInteger N)
 {
     BigInteger temp = newBigInteger();
-    temp->mag = copyList(N);
+    freeList(&(temp->mag));
+    temp->mag = copyList(N->mag);
     temp->sign = N->sign;
+    return temp;
 }
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
-    int same = 0;
-    if(A==B)
+    int aBsame = 0;
+    int srcDestSame = 0;
+    if(sign(A) == 0 || sign(B) == 0) //zero check
     {
-        same = 1;
+        if (sign(A) != 0)
+        {
+
+            S = copy(A);
+            return;
+        }
+        else
+        {
+            S = copy(B);
+            return;
+        }  
     }
-    moveBack(A->mag);
-    moveBack(B->mag);
-    if(S == A || S == B)
+    if (A == B) //check if A and B are the same object
+    {
+        aBsame = 1;
+    }
+    if (S == A) //create new big int if required
     {
         S = newBigInteger();
+        srcDestSame = 1;
     }
-    else if(length(S->mag) > 0)
+    else if(S == B)
+    {
+        S = newBigInteger();
+        srcDestSame = -1;
+    }
+    if (length(S->mag) > 0)
     {
         clear(S->mag);
     }
+    S->sign = 1;
+    moveBack(A->mag);
+    moveBack(B->mag);
     while (index(A->mag) > -1 || index(B->mag) > -1)
     {
-       
         if (index(B->mag) == -1)
         {
             while (index(A->mag) > -1)
@@ -224,10 +307,25 @@ void add(BigInteger S, BigInteger A, BigInteger B)
         }
         prepend(S->mag, (get(A->mag) + get(B->mag)));
         movePrev(A->mag);
-        if (!same)
+        if (!aBsame)
         {
             movePrev(B->mag);
         }
+    }
+    normalize(S);
+   
+    if (srcDestSame) //handle dest = src
+    {   
+        if (srcDestSame > 0)
+        {
+            freeBigInteger(&A);
+            A = copy(S);
+        }
+        else
+        {
+           freeBigInteger(&B);
+           B = copy(S);
+        }      
     }
 }
 // sum()
@@ -243,21 +341,42 @@ BigInteger sum(BigInteger A, BigInteger B)
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
-    moveBack(A->mag);
-    moveBack(B->mag);
     int same = 0;
-    if(A==B)
+    int srcDestSame = 0;
+    if(sign(A) == 0 || sign(B) == 0) //zero check
+    {
+        if (sign(A) != 0)
+        {
+            D = copy(A);
+            return;
+        }
+        else
+        {
+            D = copy(B);
+            return;
+        }  
+    }
+    if (A == B) //src1 = src2
     {
         same = 1;
     }
-    if(D==A || D==B)
+
+    if (D == A) //Dest = src1
     {
         D = newBigInteger();
+        srcDestSame = 1;
     }
-    else if(length(D->mag) > 0)
+    else if(D == B) //Dest = src2
+    {
+        D = newBigInteger();
+        srcDestSame = -1;
+    }
+    if (length(D->mag) > 0)
     {
         clear(D->mag);
     }
+    moveBack(A->mag);
+    moveBack(B->mag);
     while (index(A->mag) > -1 || index(A->mag) > -1)
     {
         if (index(B->mag) == -1)
@@ -286,6 +405,19 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
         }
     }
     normalize(D);
+    if (srcDestSame) //handle dest = src
+    {
+        if (srcDestSame > 0)
+        {
+            freeBigInteger(&A);
+            A = copy(D);
+        }
+        else
+        {
+            freeBigInteger(&B);
+            B = copy(D);
+        }      
+    }
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
@@ -307,6 +439,22 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE *out, BigInteger N)
 {
-    printList(out, N->mag);
-    printf("\n");
+    if(sign(N) == 0)
+    {
+        fprintf(out, "0");
+        return;
+    }
+    for (moveFront(N->mag); index(N->mag) > -1; moveNext(N->mag))
+    {
+        if (index(N->mag) != 0)
+        {
+            fprintf(out, "%0*ld ", POWER, get(N->mag));
+        }
+        else
+        {
+            fprintf(out, "%ld ", get(N->mag));
+        } 
+    }
+    
+    fprintf(out, "\n");
 }
