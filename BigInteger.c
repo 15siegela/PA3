@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#define BASE 1000
-#define POWER 3
+#define BASE 1000000000
+#define POWER 9
 
 // structs --------------------------------------------------------------------
 // private BigIntegerObj type
@@ -119,7 +119,7 @@ BigInteger operate(BigInteger C, BigInteger D, int op)
     }
     if (sign(A) == -1)
     {
-        //makeNeg(A);
+        makeNeg(A);
     }
     moveBack(A->mag);
     moveBack(B->mag);
@@ -144,12 +144,10 @@ BigInteger operate(BigInteger C, BigInteger D, int op)
             break;
         }
         prepend(S->mag, (get(A->mag) + get(B->mag)));
-        printf("A:%ld B:%ld \n", get(A->mag), get(B->mag));
         movePrev(A->mag);
         movePrev(B->mag);
     }
-    //normalize(Dest);  
-    printBigInteger(stdout, S);
+    //normalize(S); 
     //freeBigInteger(&A);
     //freeBigInteger(&B);
     return S;
@@ -336,7 +334,7 @@ BigInteger copy(BigInteger N)
     BigInteger temp = newBigInteger();
     freeList(&(temp->mag));
     temp->mag = copyList(N->mag);
-    temp->sign = N->sign;
+    temp->sign = sign(N);
     return temp;
 }
 // add()
@@ -344,7 +342,8 @@ BigInteger copy(BigInteger N)
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
-    S = operate(A, B, 1);
+    S = copy(operate(A, B, 1));
+    printBigInteger(stdout, S);
 }
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.

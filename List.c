@@ -472,7 +472,7 @@ List copyList(List L)
     temp = temp->next;
   }
   A->cursor = NULL;
-  A->index = 0;
+  A->index = -1;
   return A;
 }
 //concatList()

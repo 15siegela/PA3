@@ -5,7 +5,7 @@
 #  make clean               removes all binaries
 #  make memcheck            runs Arithmetic under valgrind
 #------------------------------------------------------------------------------
-CC=gcc
+CC=clang
 CLIENT         = BigIntegerTest
 ADT1           = BigInteger
 ADT2           = List

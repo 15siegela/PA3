@@ -45,6 +45,9 @@ int main()
     subtract(suma, a, a2);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
+    
+    
+    
     //Src1 = src2 sub
     printBigInteger(stdout, a);
     printf("-\n");
