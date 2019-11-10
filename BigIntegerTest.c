@@ -2,8 +2,8 @@
 
 int main()
 {
-    char* string = "100";
-    char* string2 = "50";
+    char* string = "15000000000";
+    char* string2 = "10000";
     BigInteger a = stringToBigInteger(string);
     BigInteger a2 = stringToBigInteger(string2);
 
@@ -13,7 +13,7 @@ int main()
     printBigInteger(stdout, a);
     printf("+\n");
     printBigInteger(stdout, a2);
-    printf("= "); 
+    printf("=\n"); 
     add(suma, a, a2);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
@@ -21,15 +21,22 @@ int main()
     printBigInteger(stdout, a);
     printf("+\n");
     printBigInteger(stdout, a);
-    printf("= "); 
+    printf("=\n"); 
     add(suma, a, a);
     printBigInteger(stdout, suma);
+    printf("\n______________________\n");
+    printBigInteger(stdout, a);
+    printf("+\n");
+    printBigInteger(stdout, a);
+    printf("=\n"); 
+    add(a, a, a);
+    printBigInteger(stdout, a);
     printf("\n______________________\n");
     //dest = src1 add
     printBigInteger(stdout, a);
     printf("+\n");
     printBigInteger(stdout, a2);
-    printf("= "); 
+    printf("=\n"); 
     add(a, a, a2);
     printBigInteger(stdout, a);
     printf("\n______________________\n");
@@ -41,7 +48,7 @@ int main()
     printBigInteger(stdout, a);
     printf("-\n");
     printBigInteger(stdout, a2);
-    printf("= ");
+    printf("=\n");
     subtract(suma, a, a2);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
@@ -52,7 +59,7 @@ int main()
     printBigInteger(stdout, a);
     printf("-\n");
     printBigInteger(stdout, a);
-    printf("= "); 
+    printf("=\n"); 
     subtract(suma, a, a);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");

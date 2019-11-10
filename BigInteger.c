@@ -42,23 +42,41 @@ void removeLeadZeros(BigInteger A)
 }
 void normalize(BigInteger A)
 {
+    if( A == NULL || A->mag == NULL)
+    {
+        return;
+    }
     removeLeadZeros(A);
     List L = A->mag;
     if (length(L) == 0)
     {
         return;
     }
-    moveBack(L);
-    while (index(L) > 0)
-    {
-        if (get(L) < 0)
+    moveFront(L);
+    if(get(L) < 0)
+    {  
+        int carry = 0;
+        moveBack(L);
+        while (index(L) > 0)
         {
-            set(L, -1* get(L));
-            movePrev(L);
-            set(L, get(L));
-        }
+            carry = 0;
+            if (get(L) > 0)
+            {
+                set(L, BASE - get(L));
+                carry = 1;
+            }
+            else
+            {
+                set(L, -1 * get(L));
+            }
         movePrev(L);
+        }
+        if(index(L) == 0 && carry)
+        {
+            set(L, get(L) + 1);
+        }
     }
+        
     moveBack(L);
     while (index(L) > 0)
     {
@@ -88,26 +106,40 @@ void makeNeg(BigInteger A)
         moveNext(A->mag);
     }
 }
-BigInteger operate(BigInteger C, BigInteger D, int op)
+void operate(BigInteger S, BigInteger C, BigInteger D, int op)
 {
-    BigInteger S = newBigInteger();
+    
     if (sign(C) == 0 || sign(D) == 0) //zero check
     {
         if (sign(C) != 0)
         {
 
             S = copy(C);
-            return S;
+            return;
         }
         else
         {
             S = copy(D);
-            return S;
+            return;
         }
     }
+    int srcDestSame = 0;
     BigInteger A = copy(C);
     BigInteger B = copy(D);
-   
+    if (S == C) //create new big int if required
+    {
+        S = newBigInteger();
+        srcDestSame = 1;
+    }
+    else if (S == D) //create new big int if required
+    {
+        S = newBigInteger();
+        srcDestSame = -1;
+    }
+    if (length(S->mag) > 0)
+    {
+        clear(S->mag);
+    }
     S->sign = 1;
    
     if(op == -1)
@@ -116,6 +148,10 @@ BigInteger operate(BigInteger C, BigInteger D, int op)
         {
             makeNeg(B);
         }
+    }
+    else if (sign(B) == -1)
+    {
+        makeNeg(B);
     }
     if (sign(A) == -1)
     {
@@ -147,10 +183,22 @@ BigInteger operate(BigInteger C, BigInteger D, int op)
         movePrev(A->mag);
         movePrev(B->mag);
     }
-    //normalize(S); 
-    //freeBigInteger(&A);
-    //freeBigInteger(&B);
-    return S;
+    normalize(S);
+    if (srcDestSame) //handle dest = src
+    {
+        if (srcDestSame > 0)
+        {
+            freeBigInteger(&C);
+            C = copy(S);
+        }
+        else
+        {
+            freeBigInteger(&D);
+            D = copy(S);
+        }
+    } 
+    freeBigInteger(&A);
+    freeBigInteger(&B);
 }
 
 // Constructors-Destructors ---------------------------------------------------
@@ -315,7 +363,7 @@ BigInteger stringToBigInteger(char *s)
         ret = strtol(entry, NULL, 10);
         prepend(temp->mag, ret);
         index -= POWER;
-        if (index < POWER)
+        if (index < POWER && index !=0)
         {
             char entry2[index];
             memcpy(entry2, uS, index);
@@ -342,8 +390,7 @@ BigInteger copy(BigInteger N)
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
-    S = copy(operate(A, B, 1));
-    printBigInteger(stdout, S);
+    operate(S, A, B, 1);
 }
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.
@@ -358,7 +405,7 @@ BigInteger sum(BigInteger A, BigInteger B)
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
-  D = operate(A, B, -1);
+   operate(D, A, B, -1);
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
@@ -380,9 +427,12 @@ BigInteger prod(BigInteger A, BigInteger B);
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE *out, BigInteger N)
 {
+    //fprintf(stdout, "List: ");
+    //printList(stdout, N->mag);
+    //fprintf(stdout, "\n");
     if (sign(N) == 0)
     {
-        fprintf(out, "0");
+        fprintf(out, "[0]");
         return;
     }
     if (sign(N) == -1)
