@@ -49,20 +49,13 @@ void normalize(BigInteger A)
         return;
     }
     moveBack(L);
-    if (index(L) == -1)
-    {
-        A->sign = 0;
-        return;
-    }
-    int eq = 0;
- 
     while (index(L) > 0)
     {
         if (get(L) < 0)
         {
-            set(L, BASE + get(L));
+            set(L, -1* get(L));
             movePrev(L);
-            set(L, get(L) - 1);
+            set(L, get(L));
         }
         movePrev(L);
     }
@@ -85,6 +78,81 @@ void normalize(BigInteger A)
             set(L, (get(L) * -1));
         }
     }
+}
+void makeNeg(BigInteger A)
+{
+    moveFront(A->mag);
+    while (index(A->mag) > -1)
+    {
+        set(A->mag, -1*get(A->mag));
+        moveNext(A->mag);
+    }
+}
+BigInteger operate(BigInteger C, BigInteger D, int op)
+{
+    BigInteger S = newBigInteger();
+    if (sign(C) == 0 || sign(D) == 0) //zero check
+    {
+        if (sign(C) != 0)
+        {
+
+            S = copy(C);
+            return S;
+        }
+        else
+        {
+            S = copy(D);
+            return S;
+        }
+    }
+    BigInteger A = copy(C);
+    BigInteger B = copy(D);
+   
+    S->sign = 1;
+   
+    if(op == -1)
+    {
+        if(sign(B) != -1)
+        {
+            makeNeg(B);
+        }
+    }
+    if (sign(A) == -1)
+    {
+        //makeNeg(A);
+    }
+    moveBack(A->mag);
+    moveBack(B->mag);
+    while (index(A->mag) > -1 || index(B->mag) > -1)
+    {
+        if (index(B->mag) == -1)
+        {
+            while (index(A->mag) > -1)
+            {
+                prepend(S->mag, get(A->mag));
+                movePrev(A->mag);
+            }
+            break;
+        }
+        if (index(A->mag) == -1)
+        {
+            while (index(B->mag) > -1)
+            {
+                prepend(S->mag, get(B->mag));
+                movePrev(B->mag);
+            }
+            break;
+        }
+        prepend(S->mag, (get(A->mag) + get(B->mag)));
+        printf("A:%ld B:%ld \n", get(A->mag), get(B->mag));
+        movePrev(A->mag);
+        movePrev(B->mag);
+    }
+    //normalize(Dest);  
+    printBigInteger(stdout, S);
+    //freeBigInteger(&A);
+    //freeBigInteger(&B);
+    return S;
 }
 
 // Constructors-Destructors ---------------------------------------------------
@@ -121,6 +189,8 @@ int sign(BigInteger N)
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B)
 {
+    removeLeadZeros(A);
+    removeLeadZeros(B);
     if (sign(A) > sign(B))
     {
         return 1;
@@ -137,17 +207,28 @@ int compare(BigInteger A, BigInteger B)
     {
         return 1;
     }
-    if (length(A->mag) > length(B->mag))
+    if (length(A->mag) < length(B->mag))
     {
-        return 1;
+        return -1;
     }
-    for (moveFront(A->mag), moveFront(B->mag); index(A->mag) != -1; moveNext(A->mag), moveNext(B->mag))
+    moveFront(A->mag); moveFront(B->mag);
+    while(index(A->mag) != -1)
     {
-        if (get(A->mag) > get(B->mag))
+        if((get(A->mag) == get(B->mag)))
+        {
+            moveNext(A->mag); moveNext(B->mag);
+        }
+        else if (get(A->mag) > get(B->mag))
         {
             return 1;
         }
+        else if (get(A->mag) < get(B->mag))
+        {
+            return -1;
+        }
+        
     }
+    return 0;
 }
 // equals()
 // Return true (1) if A and B are equal, false (0) otherwise.
@@ -263,91 +344,7 @@ BigInteger copy(BigInteger N)
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
-    int aBsame = 0;
-    int resSign = 1;
-    int srcDestSame = 0;
-    if (sign(A) == 0 || sign(B) == 0) //zero check
-    {
-        if (sign(A) != 0)
-        {
-
-            S = copy(A);
-            return;
-        }
-        else
-        {
-            S = copy(B);
-            return;
-        }
-    }
-    if (A->sign == -1 && B->sign == -1) //A is negative
-    {
-        resSign = -1; // S = -( B + A)
-    }
-    if (A == B) //check if A and B are the same object
-    {
-        aBsame = 1;
-    }
-    if (S == A) //create new big int if required
-    {
-        S = newBigInteger();
-        srcDestSame = 1;
-    }
-    else if (S == B) //create new big int if required
-    {
-        S = newBigInteger();
-        srcDestSame = -1;
-    }
-    if (length(S->mag) > 0)
-    {
-        clear(S->mag);
-    }
-    S->sign = resSign;
-    moveBack(A->mag);
-    moveBack(B->mag);
-    while (index(A->mag) > -1 || index(B->mag) > -1)
-    {
-        if (index(B->mag) == -1)
-        {
-            while (index(A->mag) > -1)
-            {
-                prepend(S->mag, get(A->mag));
-                movePrev(A->mag);
-            }
-            break;
-        }
-        if (index(A->mag) == -1)
-        {
-            while (index(B->mag) > -1)
-            {
-                prepend(S->mag, get(B->mag));
-                movePrev(B->mag);
-            }
-            break;
-        }
-        prepend(S->mag, (get(A->mag) + get(B->mag)));
-        movePrev(A->mag);
-        if (!aBsame)
-        {
-            movePrev(B->mag);
-        }
-    }
-
-    normalize(S);
-
-    if (srcDestSame) //handle dest = src
-    {
-        if (srcDestSame > 0)
-        {
-            freeBigInteger(&A);
-            A = copy(S);
-        }
-        else
-        {
-            freeBigInteger(&B);
-            B = copy(S);
-        }
-    }
+    S = operate(A, B, 1);
 }
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.
@@ -362,83 +359,7 @@ BigInteger sum(BigInteger A, BigInteger B)
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
-    int same = 0;
-    int srcDestSame = 0;
-    if (sign(A) == 0 || sign(B) == 0) //zero check
-    {
-        if (sign(A) != 0)
-        {
-            D = copy(A);
-            return;
-        }
-        else
-        {
-            D = copy(B);
-            return;
-        }
-    }
-    if (A == B) //src1 = src2
-    {
-        same = 1;
-    }
-
-    if (D == A) //Dest = src1
-    {
-        D = newBigInteger();
-        srcDestSame = 1;
-    }
-    else if (D == B) //Dest = src2
-    {
-        D = newBigInteger();
-        srcDestSame = -1;
-    }
-    if (length(D->mag) > 0)
-    {
-        clear(D->mag);
-    }
-    moveBack(A->mag);
-    moveBack(B->mag);
-    while (index(A->mag) > -1 || index(A->mag) > -1)
-    {
-        if (index(B->mag) == -1)
-        {
-            while (index(A->mag) > -1)
-            {
-                prepend(D->mag, get(A->mag));
-                movePrev(A->mag);
-            }
-            continue;
-        }
-        if (index(A->mag) == -1)
-        {
-            while (index(B->mag) > -1)
-            {
-                prepend(D->mag, (-1 * get(B->mag)));
-                movePrev(B->mag);
-            }
-            continue;
-        }
-        prepend(D->mag, (get(A->mag) - get(B->mag)));
-        movePrev(A->mag);
-        if (!same)
-        {
-            movePrev(B->mag);
-        }
-    }
-    normalize(D);
-    if (srcDestSame) //handle dest = src
-    {
-        if (srcDestSame > 0)
-        {
-            freeBigInteger(&A);
-            A = copy(D);
-        }
-        else
-        {
-            freeBigInteger(&B);
-            B = copy(D);
-        }
-    }
+  D = operate(A, B, -1);
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
@@ -480,6 +401,5 @@ void printBigInteger(FILE *out, BigInteger N)
             fprintf(out, "[%ld] ", get(N->mag));
         }
     }
-
     fprintf(out, "\n");
 }

@@ -471,8 +471,6 @@ List copyList(List L)
     append(A, temp->data);
     temp = temp->next;
   }
-  A->front = L->front;
-  A->back = L->back;
   A->cursor = NULL;
   A->index = 0;
   return A;
