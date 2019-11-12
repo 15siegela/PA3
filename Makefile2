@@ -17,13 +17,13 @@ ADT1_HEADER    = $(ADT1).h
 ADT2_SOURCE    = $(ADT2).c
 ADT2_OBJECT    = $(ADT2).o
 ADT2_HEADER    = $(ADT2).h
-COMPILE        = $(CC) -c -g -std=c99 -Wall
+COMPILE        = $(CC) -c -g -std=c99 -Wall -pedantic
 LINK           = $(CC) -o
 REMOVE         = rm -f
 MEMCHECK       = valgrind --leak-check=full
 
 $(CLIENT) : $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
-	$(LINK) $(CLIENT) $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
+	$(LINK) $(CLIENT) $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT) -lm
 
 $(OBJECT) : $(SOURCE) $(ADT1_HEADER) $(ADT2_HEADER)
 	$(COMPILE) $(SOURCE)

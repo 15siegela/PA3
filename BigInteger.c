@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
 #include <string.h>
 #define BASE 1000000000
 #define POWER 9
@@ -26,10 +27,16 @@ typedef struct BigIntegerObj
 //Helper Functions
 void removeLeadZeros(BigInteger A)
 {
+    if(A->mag == NULL || A == NULL)
+    {
+        return;
+    }
     moveFront(A->mag);
     while (index(A->mag) > -1)
     {
-        if (get(A->mag) == 0)
+        long val = -1;
+        val = get(A->mag);
+        if (val == 0)
         {
             deleteFront(A->mag);
         }
@@ -40,9 +47,55 @@ void removeLeadZeros(BigInteger A)
     }
     A->sign = 0;
 }
+void addPlaces(BigInteger A, int shift)
+{ 
+    List L = A->mag;
+    moveFront(L);
+    while(shift >= POWER)
+    {
+        append(L, 0);
+        shift-=POWER;
+    }
+    if(index(L) == 0 && shift >0)
+    {
+        long int val = get(L);
+        prepend(L, val/(pow(10, POWER-shift)));
+        moveFront(L);
+        moveNext(L);
+        while(index(L) > -1)
+        {
+            long val = get(L);
+            while(val == 0) //get last non zero entry
+            {
+                moveNext(L);
+                if(index(L) != -1)
+                {
+                    val = get(L);
+                }
+                else
+                {
+                    return;
+                }
+                  
+            }
+            set(L, val% (int)pow(10, POWER-shift));
+            set(L, get(L) * pow(10, shift));
+            moveNext(L);
+            if(index(L) == -1)
+            {
+                break;
+            }
+            val = get(L);
+            movePrev(L);
+            set(L, get(L) + val/(pow(10, POWER-shift)));
+            moveNext(L);
+        }
+    }
+   
+}
 void normalize(BigInteger A)
 {
-    if( A == NULL || A->mag == NULL)
+    if (A == NULL || A->mag == NULL)
     {
         return;
     }
@@ -53,8 +106,8 @@ void normalize(BigInteger A)
         return;
     }
     moveFront(L);
-    if(get(L) < 0)
-    {  
+    if (get(L) < 0)
+    {
         int carry = 0;
         moveBack(L);
         while (index(L) > 0)
@@ -69,24 +122,25 @@ void normalize(BigInteger A)
             {
                 set(L, -1 * get(L));
             }
-        movePrev(L);
+            movePrev(L);
         }
-        if(index(L) == 0 && carry)
+        if (index(L) == 0 && carry)
         {
             set(L, get(L) + 1);
         }
     }
-        
+
     moveBack(L);
     while (index(L) > 0)
     {
-        if (get(L) >= BASE)
+        while (get(L) >= BASE)
         {
             set(L, get(L) - BASE);
             movePrev(L);
             set(L, get(L) + 1);
+            moveNext(L);
         }
-        movePrev(L);
+        moveFront(L);
     }
     if (index(L) == 0)
     {
@@ -95,20 +149,32 @@ void normalize(BigInteger A)
             negate(A);
             set(L, (get(L) * -1));
         }
+        while (get(L) >= BASE)
+        {
+            int carry = 0;
+            while(get(L) >= BASE)
+            {
+               set(L, (get(L) - BASE));
+               carry++; 
+            }
+            prepend(L, carry);
+            moveFront(L);
+        }
     }
+    removeLeadZeros(A);
 }
 void makeNeg(BigInteger A)
 {
     moveFront(A->mag);
     while (index(A->mag) > -1)
     {
-        set(A->mag, -1*get(A->mag));
+        set(A->mag, -1 * get(A->mag));
         moveNext(A->mag);
     }
 }
 void operate(BigInteger S, BigInteger C, BigInteger D, int op)
 {
-    
+
     if (sign(C) == 0 || sign(D) == 0) //zero check
     {
         if (sign(C) != 0)
@@ -141,10 +207,10 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         clear(S->mag);
     }
     S->sign = 1;
-   
-    if(op == -1)
+
+    if (op == -1)
     {
-        if(sign(B) != -1)
+        if (sign(B) != -1)
         {
             makeNeg(B);
         }
@@ -196,7 +262,7 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
             freeBigInteger(&D);
             D = copy(S);
         }
-    } 
+    }
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -211,6 +277,16 @@ BigInteger newBigInteger()
     B->sign = 0;
     return B;
 }
+BigInteger MakeBigInteger(long init)
+{
+    BigInteger B = malloc(sizeof(BigIntegerObj));
+    B->mag = newList();
+    append(B->mag, init);
+    B->sign = 1;
+    normalize(B);
+    return B;
+}
+
 // freeBigInteger()
 // Frees heap memory associated with *pN, sets *pN to NULL.
 void freeBigInteger(BigInteger *pN)
@@ -218,7 +294,10 @@ void freeBigInteger(BigInteger *pN)
     BigInteger a = *pN;
     if (*pN)
     {
-        freeList(&(a->mag));
+        if (a->mag)
+        {
+            freeList(&(a->mag));
+        }
         free(*pN);
         *pN = NULL;
     }
@@ -257,12 +336,14 @@ int compare(BigInteger A, BigInteger B)
     {
         return -1;
     }
-    moveFront(A->mag); moveFront(B->mag);
-    while(index(A->mag) != -1)
+    moveFront(A->mag);
+    moveFront(B->mag);
+    while (index(A->mag) != -1)
     {
-        if((get(A->mag) == get(B->mag)))
+        if ((get(A->mag) == get(B->mag)))
         {
-            moveNext(A->mag); moveNext(B->mag);
+            moveNext(A->mag);
+            moveNext(B->mag);
         }
         else if (get(A->mag) > get(B->mag))
         {
@@ -272,7 +353,6 @@ int compare(BigInteger A, BigInteger B)
         {
             return -1;
         }
-        
     }
     return 0;
 }
@@ -363,7 +443,7 @@ BigInteger stringToBigInteger(char *s)
         ret = strtol(entry, NULL, 10);
         prepend(temp->mag, ret);
         index -= POWER;
-        if (index < POWER && index !=0)
+        if (index < POWER && index != 0)
         {
             char entry2[index];
             memcpy(entry2, uS, index);
@@ -381,7 +461,10 @@ BigInteger copy(BigInteger N)
 {
     BigInteger temp = newBigInteger();
     freeList(&(temp->mag));
-    temp->mag = copyList(N->mag);
+    if(N->mag)
+    {
+        temp->mag = copyList(N->mag);
+    }
     temp->sign = sign(N);
     return temp;
 }
@@ -405,7 +488,7 @@ BigInteger sum(BigInteger A, BigInteger B)
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
-   operate(D, A, B, -1);
+    operate(D, A, B, -1);
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
@@ -418,7 +501,73 @@ BigInteger diff(BigInteger A, BigInteger B)
 // multiply()
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B
-void multiply(BigInteger P, BigInteger A, BigInteger B);
+void multiply(BigInteger P, BigInteger C, BigInteger D)
+{ 
+    BigInteger A = copy(C);
+    BigInteger B = copy(D);
+    int srcDestSame = 0;
+    if (P == C) //create new big int if required
+    {
+        P = newBigInteger();
+        srcDestSame = 1;
+    }
+    else if (P == D) //create new big int if required
+    {
+        P = newBigInteger();
+        srcDestSame = -1;
+    }
+    if (length(P->mag) > 0)
+    {
+        clear(P->mag);
+    }
+   
+    if (A->sign == 0 || B->sign == 0)
+    {
+        freeBigInteger(&A);
+        freeBigInteger(&B);
+        return;
+    }
+    P->sign = A->sign * B->sign;
+    List aList =  A->mag;
+    List bList = B->mag;
+    removeLeadZeros(A);
+    removeLeadZeros(B);
+    moveBack(aList);
+    moveBack(bList);
+    while(index(aList) != -1)
+    {
+        long aVal = get(aList);
+        int aShift = length(aList) - (index(aList) + 1);
+        while(index(bList) != -1)
+        {
+            long tempVal = aVal * get(bList);
+            int bShift = length(bList) - (index(bList) + 1);
+            BigInteger res = MakeBigInteger(tempVal);
+            addPlaces(res, (bShift + aShift)*3);
+            add(P, P, res);
+            movePrev(bList);
+        }
+        movePrev(aList);
+        moveBack(bList);
+    }
+    normalize(P);
+    P->sign = A->sign * B->sign;
+    if (srcDestSame) //handle dest = src
+    {
+        if (srcDestSame > 0)
+        {
+            freeBigInteger(&C);
+            C = copy(P);
+        }
+        else
+        {
+            freeBigInteger(&D);
+            D = copy(P);
+        }
+    }
+    freeBigInteger(&A);
+    freeBigInteger(&B);
+}
 // prod()
 // Returns a reference to a new BigInteger object representing A*B
 BigInteger prod(BigInteger A, BigInteger B);

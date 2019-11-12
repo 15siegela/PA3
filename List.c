@@ -95,8 +95,7 @@ int length(List L)
 {
   if (L == NULL)
   {
-    fprintf(stderr, "List Error: calling length() on NULL List reference\n");
-    exit(1);
+    return 0;
   }
   return (L->length);
 }
@@ -364,7 +363,7 @@ void deleteFront(List L)
   L->length--;
   ;
   freeNode(&temp);
-  if (index >= 0)
+  if (index(L) >= 0)
   {
     L->index--;
   }
@@ -445,6 +444,14 @@ void delete (List L)
 //Pre: length()>0, index()>=0
 void set(List L, long x)
 {
+  if(L == NULL)
+  {
+    return;
+  }
+  if(length(L) == 0 || index(L) < 0)
+  {
+    fprintf(stderr, "List Error: calling set() on an invalid List reference\n");
+  }
   L->cursor->data = x;
 }
 // Other operations -----------------------------------------------------------

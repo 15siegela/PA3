@@ -2,13 +2,13 @@
 
 int main()
 {
-    char* string = "15000000000";
-    char* string2 = "10000";
+    char* string = "-111";
+    char* string2 = "-111";
     BigInteger a = stringToBigInteger(string);
+  
     BigInteger a2 = stringToBigInteger(string2);
 
     BigInteger suma = newBigInteger();
-   
     //Simple add
     printBigInteger(stdout, a);
     printf("+\n");
@@ -63,6 +63,14 @@ int main()
     subtract(suma, a, a);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
+    
+    //dest = src1 * src2
+    printBigInteger(stdout, a);
+    printf("*\n");
+    printBigInteger(stdout, a2);
+    printf("=\n"); 
+    multiply(suma, a, a2);
+    printBigInteger(stdout, suma);
     
     freeBigInteger(&a);
     freeBigInteger(&a2);

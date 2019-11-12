@@ -75,5 +75,4 @@ BigInteger prod(BigInteger A, BigInteger B);
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N);
-
 #endif
