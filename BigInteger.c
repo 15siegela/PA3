@@ -31,10 +31,9 @@ void removeLeadZeros(BigInteger A)
     {
         return;
     }
-    moveFront(A->mag);
     while (index(A->mag) > -1)
     {
-        long val = get(A->mag);
+        long val = front(A->mag);
         if (val == 0)
         {
             deleteFront(A->mag);
@@ -141,7 +140,7 @@ void normalize(BigInteger A)
             }
             if(carry)
             {
-                set(L, BASE - (BASE + get(L)));
+                set(L, (pow(10, POWER-1) + get(L)));
                 movePrev(L);
                 set(L, get(L) - 1);
             }
@@ -242,7 +241,6 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         movePrev(A->mag);
         movePrev(B->mag);
     }
-   
     normalize(S);
     freeBigInteger(&A);
     freeBigInteger(&B);
@@ -538,7 +536,7 @@ void printBigInteger(FILE *out, BigInteger N)
     //fprintf(stdout, "\n");
     if (sign(N) == 0)
     {
-        fprintf(out, "0");
+        fprintf(out, "0\n");
         return;
     }
     if (sign(N) == -1)
@@ -549,7 +547,7 @@ void printBigInteger(FILE *out, BigInteger N)
     {
         if (index(N->mag) != 0)
         {
-            fprintf(out, "%0*ld ", POWER, get(N->mag));
+            fprintf(out, "%0*ld ", POWER-1, get(N->mag));
         }
         else
         {
