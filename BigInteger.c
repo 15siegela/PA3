@@ -140,7 +140,7 @@ void normalize(BigInteger A)
             }
             if(carry)
             {
-                set(L, (pow(10, POWER-1) + get(L)));
+                set(L, (BASE + get(L)));
                 movePrev(L);
                 set(L, get(L) - 1);
             }
@@ -241,7 +241,7 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         movePrev(A->mag);
         movePrev(B->mag);
     }
-    normalize(S);
+    //normalize(S);
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -404,9 +404,17 @@ BigInteger stringToBigInteger(char *s)
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
         exit(EXIT_FAILURE);
     }
+    while(uS[0] == '0')
+    {
+        strcpy(uS, uS+1);
+    }
     sLen = strlen(uS);
     long ret;
     int index = sLen;
+    if(uS[sLen-1] == '\n')
+    {
+        index--;
+    }
     if (sLen <= POWER)
     {
         ret = strtol(uS, NULL, 10);
@@ -417,7 +425,7 @@ BigInteger stringToBigInteger(char *s)
 
     while (index > 0)
     {
-        char entry[POWER - 1];
+        char entry[POWER];
         memcpy(entry, uS + index - POWER, POWER);
         ret = strtol(entry, NULL, 10);
         prepend(temp->mag, ret);
@@ -431,7 +439,6 @@ BigInteger stringToBigInteger(char *s)
             break;
         }
     }
-    removeLeadZeros(temp);
     return temp;
 }
 // copy()
@@ -518,7 +525,6 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
         movePrev(aList);
         moveBack(bList);
     }
-    normalize(P);
     P->sign = A->sign * B->sign;
     freeBigInteger(&A);
     freeBigInteger(&B);

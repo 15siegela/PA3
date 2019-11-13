@@ -11,8 +11,8 @@
 
 int main()
 {
-    char* string = "1111111111111111";
-    char* string2 = "1111111111111111";
+    char* string = "-0041085449";
+    char* string2 = "7402779357";
     BigInteger a = stringToBigInteger(string);
   
     BigInteger a2 = stringToBigInteger(string2);
@@ -28,18 +28,33 @@ int main()
     printf("\n______________________\n");
     //Src1 = src2 add
     printBigInteger(stdout, a);
-    printf("+\n");
-    printBigInteger(stdout, a);
+    printf("-\n");
+    printBigInteger(stdout, a2);
     printf("=\n"); 
-    add(suma, a, a);
+    subtract(suma, a, a);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
     printBigInteger(stdout, a);
-    printf("+\n");
+    printf("*\n");
     printBigInteger(stdout, a);
     printf("=\n"); 
     //add(a, a, a);
-    multiply(suma, a, a2);
+    multiply(suma, a, a);
+    printBigInteger(stdout, suma);
+    printf("\n______________________\n");
+    printBigInteger(stdout, a2);
+    printf("*\n");
+    printBigInteger(stdout, a2);
+    printf("=\n"); 
+    //add(a, a, a);
+    multiply(suma, a2, a2);
+    printBigInteger(stdout, suma);
+    BigInteger tempA = newBigInteger();
+    BigInteger tempB = newBigInteger();
+    add(tempA, a, a);
+    add(tempA, tempA, a);
+    add(tempB, a2, a2);
+    subtract(suma, tempA, tempB);
     printBigInteger(stdout, suma);
     // printBigInteger(stdout, a);
     // printf("\n______________________\n");
