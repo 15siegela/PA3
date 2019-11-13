@@ -4,7 +4,7 @@
 # PA3                                                                         #
 *******************************************************************************/
 //-----------------------------------------------------------------------------
-// Biginteger.c
+// BigInteger.c
 // Implementation file for BigInt ADT
 //-----------------------------------------------------------------------------
 #include "BigInteger.h"
@@ -34,8 +34,7 @@ void removeLeadZeros(BigInteger A)
     moveFront(A->mag);
     while (index(A->mag) > -1)
     {
-        long val = -1;
-        val = get(A->mag);
+        long val = get(A->mag);
         if (val == 0)
         {
             deleteFront(A->mag);
@@ -45,7 +44,10 @@ void removeLeadZeros(BigInteger A)
             return;
         }
     }
-    A->sign = 0;
+    if(length(A->mag) == 0)
+    {
+        A->sign = 0;
+    }
 }
 void addPlaces(BigInteger A, int shift)
 { 
@@ -56,41 +58,41 @@ void addPlaces(BigInteger A, int shift)
         append(L, 0);
         shift-=POWER;
     }
-    if(index(L) == 0 && shift >0)
-    {
-        long int val = get(L);
-        prepend(L, val/(pow(10, POWER-shift)));
-        moveFront(L);
-        moveNext(L);
-        while(index(L) > -1)
-        {
-            long val = get(L);
-            while(val == 0) //get last non zero entry
-            {
-                moveNext(L);
-                if(index(L) != -1)
-                {
-                    val = get(L);
-                }
-                else
-                {
-                    return;
-                }
+    // if(index(L) == 0 && shift >0)
+    // {
+    //     long int val = get(L);
+    //     prepend(L, val/(pow(10, POWER-shift)));
+    //     moveFront(L);
+    //     moveNext(L);
+    //     while(index(L) > -1)
+    //     {
+    //         long val = get(L);
+    //         while(val == 0) //get last non zero entry
+    //         {
+    //             moveNext(L);
+    //             if(index(L) != -1)
+    //             {
+    //                 val = get(L);
+    //             }
+    //             else
+    //             {
+    //                 return;
+    //             }
                   
-            }
-            set(L, val% (int)pow(10, POWER-shift));
-            set(L, get(L) * pow(10, shift));
-            moveNext(L);
-            if(index(L) == -1)
-            {
-                break;
-            }
-            val = get(L);
-            movePrev(L);
-            set(L, get(L) + val/(pow(10, POWER-shift)));
-            moveNext(L);
-        }
-    }
+    //         }
+    //         set(L, val% (int)pow(10, POWER-shift));
+    //         set(L, get(L) * pow(10, shift));
+    //         moveNext(L);
+    //         if(index(L) == -1)
+    //         {
+    //             break;
+    //         }
+    //         val = get(L);
+    //         movePrev(L);
+    //         set(L, get(L) + val/(pow(10, POWER-shift)));
+    //         moveNext(L);
+    //     }
+    // }
    
 }
 void normalize(BigInteger A)
@@ -105,10 +107,8 @@ void normalize(BigInteger A)
     {
         return;
     }
-    moveFront(L);
-    if (get(L) < 0)
-    {
-        int carry = 0;
+    if (front(L) < 0)
+    {   int carry = 0;
         moveBack(L);
         while (index(L) > 0)
         {
@@ -116,7 +116,7 @@ void normalize(BigInteger A)
             if (get(L) > 0)
             {
                 set(L, BASE - get(L));
-                carry = 1;
+                carry =1;
             }
             else
             {
@@ -129,18 +129,46 @@ void normalize(BigInteger A)
             set(L, get(L) + 1);
         }
     }
-
+    else if (front(L) > 0)
+    {   int carry = 0;
+        moveBack(L);
+        while (index(L) > 0)
+        {
+            carry = 0;
+            while(get(L) + BASE*carry < 0)
+            {
+                carry++;
+            }
+            if(carry)
+            {
+                set(L, BASE - (BASE + get(L)));
+                movePrev(L);
+                set(L, get(L) - 1);
+            }
+            else
+            {
+                movePrev(L);  
+            }  
+        }
+    }
     moveBack(L);
     while (index(L) > 0)
     {
-        while (get(L) >= BASE)
+        int carry = 0;
+        while (get(L) - (carry*BASE) >= BASE)
         {
-            set(L, get(L) - BASE);
-            movePrev(L);
-            set(L, get(L) + 1);
-            moveNext(L);
+            carry++;    
         }
-        moveFront(L);
+        if(carry)
+        {
+            set(L, get(L) - carry*BASE);
+            movePrev(L);
+            set(L, get(L) + carry);
+        }
+        else
+        {
+            movePrev(L);  
+        }    
     }
     if (index(L) == 0)
     {
@@ -163,15 +191,7 @@ void normalize(BigInteger A)
     }
     removeLeadZeros(A);
 }
-void makeNeg(BigInteger A)
-{
-    moveFront(A->mag);
-    while (index(A->mag) > -1)
-    {
-        set(A->mag, -1 * get(A->mag));
-        moveNext(A->mag);
-    }
-}
+
 void operate(BigInteger S, BigInteger C, BigInteger D, int op)
 {
 
@@ -189,40 +209,13 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
             return;
         }
     }
-    int srcDestSame = 0;
     BigInteger A = copy(C);
     BigInteger B = copy(D);
-    if (S == C) //create new big int if required
-    {
-        S = newBigInteger();
-        srcDestSame = 1;
-    }
-    else if (S == D) //create new big int if required
-    {
-        S = newBigInteger();
-        srcDestSame = -1;
-    }
     if (length(S->mag) > 0)
     {
         clear(S->mag);
     }
     S->sign = 1;
-
-    if (op == -1)
-    {
-        if (sign(B) != -1)
-        {
-            makeNeg(B);
-        }
-    }
-    else if (sign(B) == -1)
-    {
-        makeNeg(B);
-    }
-    if (sign(A) == -1)
-    {
-        makeNeg(A);
-    }
     moveBack(A->mag);
     moveBack(B->mag);
     while (index(A->mag) > -1 || index(B->mag) > -1)
@@ -231,7 +224,7 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         {
             while (index(A->mag) > -1)
             {
-                prepend(S->mag, get(A->mag));
+                prepend(S->mag, A->sign*get(A->mag));
                 movePrev(A->mag);
             }
             break;
@@ -240,29 +233,17 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         {
             while (index(B->mag) > -1)
             {
-                prepend(S->mag, get(B->mag));
+                prepend(S->mag, B->sign* op* get(B->mag));
                 movePrev(B->mag);
             }
             break;
         }
-        prepend(S->mag, (get(A->mag) + get(B->mag)));
+        prepend(S->mag, ((A->sign * get(A->mag)) + (B->sign * op* get(B->mag))));
         movePrev(A->mag);
         movePrev(B->mag);
     }
+   
     normalize(S);
-    if (srcDestSame) //handle dest = src
-    {
-        if (srcDestSame > 0)
-        {
-            freeBigInteger(&C);
-            C = copy(S);
-        }
-        else
-        {
-            freeBigInteger(&D);
-            D = copy(S);
-        }
-    }
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -505,17 +486,6 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
 { 
     BigInteger A = copy(C);
     BigInteger B = copy(D);
-    int srcDestSame = 0;
-    if (P == C) //create new big int if required
-    {
-        P = newBigInteger();
-        srcDestSame = 1;
-    }
-    else if (P == D) //create new big int if required
-    {
-        P = newBigInteger();
-        srcDestSame = -1;
-    }
     if (length(P->mag) > 0)
     {
         clear(P->mag);
@@ -543,7 +513,7 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
             long tempVal = aVal * get(bList);
             int bShift = length(bList) - (index(bList) + 1);
             BigInteger res = MakeBigInteger(tempVal);
-            addPlaces(res, (bShift + aShift)*3);
+            addPlaces(res, (bShift + aShift)*POWER);
             add(P, P, res);
             movePrev(bList);
         }
@@ -552,19 +522,6 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
     }
     normalize(P);
     P->sign = A->sign * B->sign;
-    if (srcDestSame) //handle dest = src
-    {
-        if (srcDestSame > 0)
-        {
-            freeBigInteger(&C);
-            C = copy(P);
-        }
-        else
-        {
-            freeBigInteger(&D);
-            D = copy(P);
-        }
-    }
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -581,7 +538,7 @@ void printBigInteger(FILE *out, BigInteger N)
     //fprintf(stdout, "\n");
     if (sign(N) == 0)
     {
-        fprintf(out, "[0]");
+        fprintf(out, "0");
         return;
     }
     if (sign(N) == -1)
@@ -592,11 +549,11 @@ void printBigInteger(FILE *out, BigInteger N)
     {
         if (index(N->mag) != 0)
         {
-            fprintf(out, "[%0*ld] ", POWER, get(N->mag));
+            fprintf(out, "%0*ld ", POWER, get(N->mag));
         }
         else
         {
-            fprintf(out, "[%ld] ", get(N->mag));
+            fprintf(out, "%ld ", get(N->mag));
         }
     }
     fprintf(out, "\n");

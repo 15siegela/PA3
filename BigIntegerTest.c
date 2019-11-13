@@ -1,9 +1,18 @@
+/******************************************************************************
+# Alec Siegel                                                                 #
+# 1744236                                                                     #
+# PA3                                                                         #
+*******************************************************************************/
+//-----------------------------------------------------------------------------
+// BigIntegerTest.c
+// Test file for BigInt ADT
+//-----------------------------------------------------------------------------
 #include "BigInteger.h"
 
 int main()
 {
-    char* string = "-111";
-    char* string2 = "-111";
+    char* string = "1111111111111111";
+    char* string2 = "1111111111111111";
     BigInteger a = stringToBigInteger(string);
   
     BigInteger a2 = stringToBigInteger(string2);
@@ -29,48 +38,50 @@ int main()
     printf("+\n");
     printBigInteger(stdout, a);
     printf("=\n"); 
-    add(a, a, a);
-    printBigInteger(stdout, a);
-    printf("\n______________________\n");
-    //dest = src1 add
-    printBigInteger(stdout, a);
-    printf("+\n");
-    printBigInteger(stdout, a2);
-    printf("=\n"); 
-    add(a, a, a2);
-    printBigInteger(stdout, a);
-    printf("\n______________________\n");
-
-    a = stringToBigInteger(string);
-    a2 = stringToBigInteger(string2);
-    //simple subtract
-    
-    printBigInteger(stdout, a);
-    printf("-\n");
-    printBigInteger(stdout, a2);
-    printf("=\n");
-    subtract(suma, a, a2);
-    printBigInteger(stdout, suma);
-    printf("\n______________________\n");
-    
-    
-    
-    //Src1 = src2 sub
-    printBigInteger(stdout, a);
-    printf("-\n");
-    printBigInteger(stdout, a);
-    printf("=\n"); 
-    subtract(suma, a, a);
-    printBigInteger(stdout, suma);
-    printf("\n______________________\n");
-    
-    //dest = src1 * src2
-    printBigInteger(stdout, a);
-    printf("*\n");
-    printBigInteger(stdout, a2);
-    printf("=\n"); 
+    //add(a, a, a);
     multiply(suma, a, a2);
     printBigInteger(stdout, suma);
+    // printBigInteger(stdout, a);
+    // printf("\n______________________\n");
+    // //dest = src1 add
+    // printBigInteger(stdout, a);
+    // printf("+\n");
+    // printBigInteger(stdout, a2);
+    // printf("=\n"); 
+    // add(a, a, a2);
+    // printBigInteger(stdout, a);
+    // printf("\n______________________\n");
+
+    // a = stringToBigInteger(string);
+    // a2 = stringToBigInteger(string2);
+    // //simple subtract
+    
+    // printBigInteger(stdout, a);
+    // printf("-\n");
+    // printBigInteger(stdout, a2);
+    // printf("=\n");
+    // subtract(suma, a, a2);
+    // printBigInteger(stdout, suma);
+    // printf("\n______________________\n");
+    
+    
+    
+    // //Src1 = src2 sub
+    // printBigInteger(stdout, a);
+    // printf("-\n");
+    // printBigInteger(stdout, a);
+    // printf("=\n"); 
+    // subtract(suma, a, a);
+    // printBigInteger(stdout, suma);
+    // printf("\n______________________\n");
+    
+    // //dest = src1 * src2
+    // printBigInteger(stdout, a);
+    // printf("*\n");
+    // printBigInteger(stdout, a2);
+    // printf("=\n"); 
+    // multiply(suma, a, a2);
+    // printBigInteger(stdout, suma);
     
     freeBigInteger(&a);
     freeBigInteger(&a2);
