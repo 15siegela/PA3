@@ -525,7 +525,12 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
 }
 // prod()
 // Returns a reference to a new BigInteger object representing A*B
-BigInteger prod(BigInteger A, BigInteger B);
+BigInteger prod(BigInteger A, BigInteger B)
+{
+    BigInteger temp = newBigInteger();
+    multiply(temp, A, B);
+    return temp;
+}
 // Other operations -----------------------------------------------------------
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
