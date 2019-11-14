@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include<math.h>
-#define M_DATA_LEN 100
+#define M_DATA_LEN 1000
 
 // read each line of input file, then count
 int getCount(char *buf, FILE *in)
@@ -106,4 +106,10 @@ int main(int argc, char **argv)
     
     add(res, tempA, tempB);
     printBigInteger(out, res);
+
+    freeBigInteger(&A);
+    freeBigInteger(&B);
+    freeBigInteger(&tempA);
+    freeBigInteger(&tempB);
+    freeBigInteger(&res);
 }
