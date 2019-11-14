@@ -69,33 +69,33 @@ int main(int argc, char **argv)
     int digitsA = getCount(buf, in);
     char aBuf[digitsA+1];
     BigInteger A = createBigInt(aBuf, in);
-    printBigInteger(stdout, A);
+    printBigInteger(out, A);
     int digitsB = getCount(buf, in);
     char bBuf[digitsB+1];
     BigInteger B = createBigInt(bBuf, in);
-    printBigInteger(stdout, B);
+    printBigInteger(out, B);
     add(res, A, B);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
     subtract(res, A, B);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
     subtract(res, A, A);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
     BigInteger tempA = copy(A);
     BigInteger tempB = copy(B);
     scalar(tempA, 3);
     scalar(tempB, 2);
    
     subtract(res, tempA, tempB);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
     
     multiply(res, A, B);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
     
     
     multiply(tempA, A, A);
-    printBigInteger(stdout, tempA);
+    printBigInteger(out, tempA);
     multiply(tempB, B, B);
-    printBigInteger(stdout, tempB);
+    printBigInteger(out, tempB);
     
     multiply(tempA, tempA, tempA);
     scalar(tempA, 9);
@@ -105,5 +105,5 @@ int main(int argc, char **argv)
     scalar(tempB, 16);
     
     add(res, tempA, tempB);
-    printBigInteger(stdout, res);
+    printBigInteger(out, res);
 }
