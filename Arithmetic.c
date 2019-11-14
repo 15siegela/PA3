@@ -80,30 +80,30 @@ int main(int argc, char **argv)
     printBigInteger(stdout, res);
     subtract(res, A, A);
     printBigInteger(stdout, res);
-    BigInteger tempA = newBigInteger();
-    BigInteger tempB = newBigInteger();
-    add(tempA, A, A);
-    add(tempA, tempA, A);
-    add(tempB, B, B);
+    BigInteger tempA = copy(A);
+    BigInteger tempB = copy(B);
+    scalar(tempA, 3);
+    scalar(tempB, 2);
+   
     subtract(res, tempA, tempB);
     printBigInteger(stdout, res);
+    
     multiply(res, A, B);
     printBigInteger(stdout, res);
-    multiply(res, A, A);
-    printBigInteger(stdout, res);
-    multiply(res, B, B);
-    printBigInteger(stdout, res);
+    
+    
     multiply(tempA, A, A);
-    multiply(tempA, tempA, tempA);
-    for (int i = 0; i < 8; i++)
-    {
-        add(tempA, tempA, A);
-    }
+    printBigInteger(stdout, tempA);
     multiply(tempB, B, B);
-    for (int i = 0; i < 3; i++)
-    {
-        multiply(tempB, tempB, B);
-    }
+    printBigInteger(stdout, tempB);
+    
+    multiply(tempA, tempA, tempA);
+    scalar(tempA, 9);
+    
+    multiply(tempB, tempB, tempB);
+    multiply(tempB, tempB, B);
+    scalar(tempB, 16);
+    
     add(res, tempA, tempB);
     printBigInteger(stdout, res);
 }

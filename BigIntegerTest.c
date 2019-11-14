@@ -11,10 +11,9 @@
 
 int main()
 {
-    char* string = "-0041085449";
-    char* string2 = "7402779357";
-    BigInteger a = stringToBigInteger(string);
-  
+    char* string2 = "-0041085449";
+    char* string = "7402779357";
+    BigInteger a = stringToBigInteger(string); 
     BigInteger a2 = stringToBigInteger(string2);
 
     BigInteger suma = newBigInteger();
@@ -31,7 +30,7 @@ int main()
     printf("-\n");
     printBigInteger(stdout, a2);
     printf("=\n"); 
-    subtract(suma, a, a);
+    subtract(suma, a, a2);
     printBigInteger(stdout, suma);
     printf("\n______________________\n");
     printBigInteger(stdout, a);
@@ -44,10 +43,10 @@ int main()
     printf("\n______________________\n");
     printBigInteger(stdout, a2);
     printf("*\n");
-    printBigInteger(stdout, a2);
+    printBigInteger(stdout, a);
     printf("=\n"); 
     //add(a, a, a);
-    multiply(suma, a2, a2);
+    multiply(suma, a, a2);
     printBigInteger(stdout, suma);
     BigInteger tempA = newBigInteger();
     BigInteger tempB = newBigInteger();

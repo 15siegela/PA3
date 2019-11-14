@@ -25,6 +25,7 @@ typedef struct BigIntegerObj
     int sign;
 } BigIntegerObj;
 //Helper Functions
+
 void removeLeadZeros(BigInteger A)
 {
     if(A->mag == NULL || A == NULL)
@@ -74,9 +75,9 @@ void addPlaces(BigInteger A, int shift)
     //                 val = get(L);
     //             }
     //             else
-    //             {
-    //                 return;
-    //             }
+    //             {return;}
+                    
+                
                   
     //         }
     //         set(L, val% (int)pow(10, POWER-shift));
@@ -95,97 +96,107 @@ void addPlaces(BigInteger A, int shift)
    
 }
 void normalize(BigInteger A)
-{
-    if (A == NULL || A->mag == NULL)
-    {
-        return;
-    }
-    removeLeadZeros(A);
-    List L = A->mag;
-    if (length(L) == 0)
-    {
-        return;
-    }
-    if (front(L) < 0)
-    {   int carry = 0;
-        moveBack(L);
-        while (index(L) > 0)
-        {
-            carry = 0;
-            if (get(L) > 0)
-            {
-                set(L, BASE - get(L));
-                carry =1;
-            }
-            else
-            {
-                set(L, -1 * get(L));
-            }
-            movePrev(L);
-        }
-        if (index(L) == 0 && carry)
-        {
-            set(L, get(L) + 1);
-        }
-    }
-    else if (front(L) > 0)
-    {   int carry = 0;
-        moveBack(L);
-        while (index(L) > 0)
-        {
-            carry = 0;
-            while(get(L) + BASE*carry < 0)
-            {
-                carry++;
-            }
-            if(carry)
-            {
-                set(L, (BASE + get(L)));
-                movePrev(L);
-                set(L, get(L) - 1);
-            }
-            else
-            {
-                movePrev(L);  
-            }  
-        }
-    }
+{   List L = A->mag;
     moveBack(L);
+    long carry = 0;
     while (index(L) > 0)
     {
-        int carry = 0;
-        while (get(L) - (carry*BASE) >= BASE)
+        if(carry) //if carry != 0
         {
-            carry++;    
-        }
+            set(L, get(L) + carry); //apply carry
+        }     
+        carry = get(L)/BASE;
         if(carry)
         {
-            set(L, get(L) - carry*BASE);
+            set(L, get(L) - (carry*BASE));
+        }
+        movePrev(L);    
+    }
+    if(carry)
+    {
+        moveFront(L);
+        set(L, get(L) + carry);
+        carry=0;
+    }
+    if(length(L) == 0)
+    {
+        return;
+    }
+    if (get(L) < 0)
+    {
+        negate(A);
+        set(L, (get(L) * -1));
+    }    
+    while (front(L) >= BASE)
+    {   moveFront(L);
+        carry = get(L)/BASE;
+        set(L, (get(L) - (carry*BASE)));
+        prepend(L, carry);
+    }
+    
+}
+void scalar(BigInteger A, long num)
+{
+    moveBack(A->mag);
+    while (index(A->mag) > -1)
+    {
+       set(A->mag, num*get(A->mag));
+       movePrev(A->mag);
+    }
+    normalize(A);
+}
+int negCheck(BigInteger A)
+{
+    List L = A->mag;
+    moveBack(L);
+    while(index(L) > -1)
+    {
+        if(get(L) <= 0)
+        {
             movePrev(L);
-            set(L, get(L) + carry);
         }
         else
         {
-            movePrev(L);  
-        }    
-    }
-    if (index(L) == 0)
+            return -1;   
+        }
+        
+    } 
+    scalar(A, -1);
+    negate(A); 
+    return 1;
+}
+
+void negNormalize(BigInteger A)
+{
+    List L = A->mag;
+    if (A == NULL || L == NULL)
     {
-        if (get(L) < 0)
+        return;
+    }
+    if (negCheck(A) == -1)
+    {
+        moveBack(L);
+        long carry = 0;
+        while(index(L) > -1)
+        {
+            if(carry) //if carry != 0
+            {
+                set(L, get(L) + carry); //apply carry
+            }  
+            int val = get(L);
+            if(val < 0)
+            { 
+                carry = -1;
+                set(L, val + 1*BASE);
+                movePrev(L);
+                continue;
+            }
+            movePrev(L);
+            carry = 0;
+        }
+        if(carry)
         {
             negate(A);
-            set(L, (get(L) * -1));
-        }
-        while (get(L) >= BASE)
-        {
-            int carry = 0;
-            while(get(L) >= BASE)
-            {
-               set(L, (get(L) - BASE));
-               carry++; 
-            }
-            prepend(L, carry);
-            moveFront(L);
         }
     }
     removeLeadZeros(A);
@@ -241,7 +252,7 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         movePrev(A->mag);
         movePrev(B->mag);
     }
-    //normalize(S);
+    removeLeadZeros(S);
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -413,6 +424,7 @@ BigInteger stringToBigInteger(char *s)
     int index = sLen;
     if(uS[sLen-1] == '\n')
     {
+        printf("");
         index--;
     }
     if (sLen <= POWER)
@@ -460,6 +472,8 @@ BigInteger copy(BigInteger N)
 void add(BigInteger S, BigInteger A, BigInteger B)
 {
     operate(S, A, B, 1);
+    negNormalize(S);
+    normalize(S);
 }
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.
@@ -475,6 +489,8 @@ BigInteger sum(BigInteger A, BigInteger B)
 void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     operate(D, A, B, -1);
+    negNormalize(D);
+    normalize(D);
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
@@ -502,7 +518,7 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
         freeBigInteger(&B);
         return;
     }
-    P->sign = A->sign * B->sign;
+    P->sign = 1;
     List aList =  A->mag;
     List bList = B->mag;
     removeLeadZeros(A);
@@ -525,7 +541,7 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
         movePrev(aList);
         moveBack(bList);
     }
-    P->sign = A->sign * B->sign;
+    P->sign = C->sign * D->sign;
     freeBigInteger(&A);
     freeBigInteger(&B);
 }
@@ -545,7 +561,7 @@ void printBigInteger(FILE *out, BigInteger N)
     //fprintf(stdout, "List: ");
     //printList(stdout, N->mag);
     //fprintf(stdout, "\n");
-    if (sign(N) == 0)
+    if (sign(N) == 0 || front(N->mag) == 0)
     {
         fprintf(out, "0\n");
         return;
@@ -558,11 +574,11 @@ void printBigInteger(FILE *out, BigInteger N)
     {
         if (index(N->mag) != 0)
         {
-            fprintf(out, "%0*ld ", POWER-1, get(N->mag));
+            fprintf(out, "%0*ld", POWER-1, get(N->mag));
         }
         else
         {
-            fprintf(out, "%ld ", get(N->mag));
+            fprintf(out, "%ld", get(N->mag));
         }
     }
     fprintf(out, "\n");
