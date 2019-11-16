@@ -414,7 +414,7 @@ BigInteger stringToBigInteger(char *s)
     }
     while (uS[0] == '0')
     {
-        strcpy(uS, uS + 1);
+        memcpy(uS, uS + 1, --sLen);
     }
     sLen = strlen(uS);
     long ret = 0;
