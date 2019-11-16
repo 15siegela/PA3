@@ -362,7 +362,7 @@ void deleteFront(List L)
   }
   L->length--;
   ;
-  freeNode(&temp);
+  //freeNode(&temp);
   if (index(L) >= 0)
   {
     L->index--;

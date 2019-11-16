@@ -25,6 +25,7 @@ int getCount(char *buf, FILE *in)
     else
     {
         fprintf(stderr, "There was an error processing the input file");
+        exit(EXIT_FAILURE);
     }
     return 0;
 }
@@ -39,7 +40,8 @@ BigInteger createBigInt(char *buf, FILE *in)
     else
     {
         fprintf(stderr, "There was an error processing the input file");
-    }
+        exit(EXIT_FAILURE);
+    }  
 }
 
 int main(int argc, char **argv)
