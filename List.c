@@ -174,6 +174,7 @@ void clear(List L)
   {
     moveFront(L);
     delete(L);
+    
   }
   L->length = 0;
   L->index = -1;
@@ -362,6 +363,7 @@ void deleteFront(List L)
   L->length--;
   ;
   freeNode(&temp);
+  temp = NULL;
   if (index(L) >= 0)
   {
     L->index--;
@@ -393,7 +395,12 @@ void deleteBack(List L)
     L->front = L->back;
   }
   L->length--;
+  if (index(L) == length(L))
+  {
+    L->index--;
+  }
   freeNode(&temp);
+  temp = NULL;
 }
 // Delete cursor element, making cursor undefined.
 // Pre: length()>0, index()>=0
@@ -433,6 +440,7 @@ void delete (List L)
   }
   L->length--;
   freeNode(&L->cursor);
+
   
   //cursor becomes undefined
   L->index = -1;
