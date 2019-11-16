@@ -28,7 +28,7 @@ typedef struct BigIntegerObj
 
 void removeLeadZeros(BigInteger A)
 {
-    if(A->mag == NULL || A == NULL)
+    if (A->mag == NULL || A == NULL)
     {
         return;
     }
@@ -44,19 +44,19 @@ void removeLeadZeros(BigInteger A)
             return;
         }
     }
-    if(length(A->mag) == 0)
+    if (length(A->mag) == 0)
     {
         A->sign = 0;
     }
 }
 void addPlaces(BigInteger A, int shift)
-{ 
+{
     List L = A->mag;
     moveFront(L);
-    while(shift >= POWER)
+    while (shift >= POWER)
     {
         append(L, 0);
-        shift-=POWER;
+        shift -= POWER;
     }
     // if(index(L) == 0 && shift >0)
     // {
@@ -76,9 +76,7 @@ void addPlaces(BigInteger A, int shift)
     //             }
     //             else
     //             {return;}
-                    
-                
-                  
+
     //         }
     //         set(L, val% (int)pow(10, POWER-shift));
     //         set(L, get(L) * pow(10, shift));
@@ -93,32 +91,32 @@ void addPlaces(BigInteger A, int shift)
     //         moveNext(L);
     //     }
     // }
-   
 }
 void normalize(BigInteger A)
-{   List L = A->mag;
+{
+    List L = A->mag;
     moveBack(L);
     long carry = 0;
     while (index(L) > 0)
     {
-        if(carry) //if carry != 0
+        if (carry) //if carry != 0
         {
             set(L, get(L) + carry); //apply carry
-        }     
-        carry = get(L)/BASE;
-        if(carry)
-        {
-            set(L, get(L) - (carry*BASE));
         }
-        movePrev(L);    
+        carry = get(L) / BASE;
+        if (carry)
+        {
+            set(L, get(L) - (carry * BASE));
+        }
+        movePrev(L);
     }
-    if(carry)
+    if (carry)
     {
         moveFront(L);
         set(L, get(L) + carry);
-        carry=0;
+        carry = 0;
     }
-    if(length(L) == 0)
+    if (length(L) == 0)
     {
         return;
     }
@@ -126,22 +124,22 @@ void normalize(BigInteger A)
     {
         negate(A);
         set(L, (get(L) * -1));
-    }    
+    }
     while (front(L) >= BASE)
-    {   moveFront(L);
-        carry = get(L)/BASE;
-        set(L, (get(L) - (carry*BASE)));
+    {
+        moveFront(L);
+        carry = get(L) / BASE;
+        set(L, (get(L) - (carry * BASE)));
         prepend(L, carry);
     }
-    
 }
 void scalar(BigInteger A, long num)
 {
     moveBack(A->mag);
     while (index(A->mag) > -1)
     {
-       set(A->mag, num*get(A->mag));
-       movePrev(A->mag);
+        set(A->mag, num * get(A->mag));
+        movePrev(A->mag);
     }
     normalize(A);
 }
@@ -149,20 +147,19 @@ int negCheck(BigInteger A)
 {
     List L = A->mag;
     moveBack(L);
-    while(index(L) > -1)
+    while (index(L) > -1)
     {
-        if(get(L) <= 0)
+        if (get(L) <= 0)
         {
             movePrev(L);
         }
         else
         {
-            return -1;   
+            return -1;
         }
-        
-    } 
+    }
     scalar(A, -1);
-    negate(A); 
+    negate(A);
     return 1;
 }
 
@@ -177,24 +174,24 @@ void negNormalize(BigInteger A)
     {
         moveBack(L);
         long carry = 0;
-        while(index(L) > -1)
+        while (index(L) > -1)
         {
-            if(carry) //if carry != 0
+            if (carry) //if carry != 0
             {
                 set(L, get(L) + carry); //apply carry
-            }  
+            }
             int val = get(L);
-            if(val < 0)
-            { 
+            if (val < 0)
+            {
                 carry = -1;
-                set(L, val + 1*BASE);
+                set(L, val + 1 * BASE);
                 movePrev(L);
                 continue;
             }
             movePrev(L);
             carry = 0;
         }
-        if(carry)
+        if (carry)
         {
             negate(A);
         }
@@ -234,7 +231,7 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         {
             while (index(A->mag) > -1)
             {
-                prepend(S->mag, A->sign*get(A->mag));
+                prepend(S->mag, A->sign * get(A->mag));
                 movePrev(A->mag);
             }
             break;
@@ -243,12 +240,12 @@ void operate(BigInteger S, BigInteger C, BigInteger D, int op)
         {
             while (index(B->mag) > -1)
             {
-                prepend(S->mag, B->sign* op* get(B->mag));
+                prepend(S->mag, B->sign * op * get(B->mag));
                 movePrev(B->mag);
             }
             break;
         }
-        prepend(S->mag, ((A->sign * get(A->mag)) + (B->sign * op* get(B->mag))));
+        prepend(S->mag, ((A->sign * get(A->mag)) + (B->sign * op * get(B->mag))));
         movePrev(A->mag);
         movePrev(B->mag);
     }
@@ -269,8 +266,7 @@ BigInteger newBigInteger()
 }
 BigInteger MakeBigInteger(long init)
 {
-    BigInteger B = malloc(sizeof(BigIntegerObj));
-    B->mag = newList();
+    BigInteger B = newBigInteger();
     append(B->mag, init);
     B->sign = 1;
     normalize(B);
@@ -393,7 +389,8 @@ BigInteger stringToBigInteger(char *s)
         exit(EXIT_FAILURE);
     }
     BigInteger temp = newBigInteger();
-    int sLen = strlen(s);
+    int sLen = 0;
+    sLen = strlen(s);
     char uS[sLen];
     if (s[0] == '-')
     {
@@ -415,14 +412,14 @@ BigInteger stringToBigInteger(char *s)
         fprintf(stderr, "BigInteger Error: calling stringToBigInteger on invalid string");
         exit(EXIT_FAILURE);
     }
-    while(uS[0] == '0')
+    while (uS[0] == '0')
     {
-        strcpy(uS, uS+1);
+        strcpy(uS, uS + 1);
     }
     sLen = strlen(uS);
-    long ret;
+    long ret = 0;
     int index = sLen;
-    if(uS[sLen-1] == '\n')
+    if (uS[sLen - 1] == '\n')
     {
         printf("");
         index--;
@@ -459,7 +456,7 @@ BigInteger copy(BigInteger N)
 {
     BigInteger temp = newBigInteger();
     freeList(&(temp->mag));
-    if(N->mag)
+    if (N->mag)
     {
         temp->mag = copyList(N->mag);
     }
@@ -504,14 +501,14 @@ BigInteger diff(BigInteger A, BigInteger B)
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B
 void multiply(BigInteger P, BigInteger C, BigInteger D)
-{ 
+{
     BigInteger A = copy(C);
     BigInteger B = copy(D);
     if (length(P->mag) > 0)
     {
         clear(P->mag);
     }
-   
+
     if (A->sign == 0 || B->sign == 0)
     {
         freeBigInteger(&A);
@@ -519,23 +516,25 @@ void multiply(BigInteger P, BigInteger C, BigInteger D)
         return;
     }
     P->sign = 1;
-    List aList =  A->mag;
+    List aList = A->mag;
     List bList = B->mag;
     removeLeadZeros(A);
     removeLeadZeros(B);
     moveBack(aList);
     moveBack(bList);
-    while(index(aList) != -1)
+    while (index(aList) != -1)
     {
         long aVal = get(aList);
         int aShift = length(aList) - (index(aList) + 1);
-        while(index(bList) != -1)
+        while (index(bList) != -1)
         {
             long tempVal = aVal * get(bList);
             int bShift = length(bList) - (index(bList) + 1);
             BigInteger res = MakeBigInteger(tempVal);
-            addPlaces(res, (bShift + aShift)*POWER);
+            addPlaces(res, (bShift + aShift) * POWER);
             add(P, P, res);
+            freeBigInteger(&res);
+            res = NULL;
             movePrev(bList);
         }
         movePrev(aList);

@@ -113,4 +113,6 @@ int main(int argc, char **argv)
     freeBigInteger(&tempA);
     freeBigInteger(&tempB);
     freeBigInteger(&res);
+    fclose(in);
+    fclose(out);
 }
