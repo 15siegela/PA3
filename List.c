@@ -172,9 +172,10 @@ void clear(List L)
 {
   while (length(L) > 0)
   {
-    if(front(L))
+    moveFront(L);
+    if(front(L) != NULL)
     {
-      deleteFront(L);
+       delete(L);
     }
   }
   L->length = 0;
