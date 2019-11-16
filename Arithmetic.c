@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include<math.h>
-#define M_DATA_LEN 1000
+#define M_DATA_LEN 15000
 
 // read each line of input file, then count
 int getCount(char *buf, FILE *in)
@@ -26,6 +26,7 @@ int getCount(char *buf, FILE *in)
     {
         fprintf(stderr, "There was an error processing the input file");
     }
+    return 0;
 }
 
 BigInteger createBigInt(char *buf, FILE *in)

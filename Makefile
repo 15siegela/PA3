@@ -17,8 +17,8 @@ ADT1_HEADER    = $(ADT1).h
 ADT2_SOURCE    = $(ADT2).c
 ADT2_OBJECT    = $(ADT2).o
 ADT2_HEADER    = $(ADT2).h
-COMPILE        = $(CC) -c -g -std=c99 -Wall
-LINK           = $(CC) -o
+COMPILE        = $(CC) -c -g -fPIC -std=c99 -Wall 
+LINK           = $(CC) -o 
 REMOVE         = rm -f
 MEMCHECK       = valgrind --leak-check=full
 

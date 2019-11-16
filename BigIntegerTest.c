@@ -11,8 +11,8 @@
 
 int main()
 {
-    char* string2 = "-0041085449";
-    char* string = "7402779357";
+    char* string2 = "9163574346363325007361058";
+    char* string = "+4597814412658653960738664";
     BigInteger a = stringToBigInteger(string); 
     BigInteger a2 = stringToBigInteger(string2);
 

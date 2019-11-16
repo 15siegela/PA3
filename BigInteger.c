@@ -563,7 +563,7 @@ void printBigInteger(FILE *out, BigInteger N)
     //fprintf(stdout, "\n");
     if (sign(N) == 0 || front(N->mag) == 0)
     {
-        fprintf(out, "0\n");
+        fprintf(out, "0\n\n");
         return;
     }
     if (sign(N) == -1)
@@ -574,12 +574,12 @@ void printBigInteger(FILE *out, BigInteger N)
     {
         if (index(N->mag) != 0)
         {
-            fprintf(out, "%0*ld", POWER-1, get(N->mag));
+            fprintf(out, "%0*ld", POWER, get(N->mag));
         }
         else
         {
             fprintf(out, "%ld", get(N->mag));
         }
     }
-    fprintf(out, "\n");
+    fprintf(out, "\n\n");
 }
