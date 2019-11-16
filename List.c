@@ -173,10 +173,7 @@ void clear(List L)
   while (length(L) > 0)
   {
     moveFront(L);
-    if(front(L) != NULL)
-    {
-       delete(L);
-    }
+    delete(L);
   }
   L->length = 0;
   L->index = -1;
