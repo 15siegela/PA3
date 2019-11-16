@@ -158,7 +158,7 @@ int negCheck(BigInteger A)
             return -1;
         }
     }
-    
+    negate(A);
     scalar(A, -1);
     return 1;
 }
@@ -514,10 +514,7 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     operate(D, A, B, -1);
     negNormalize(D);
-    //normalize(D);
-   
-    
-    
+    normalize(D); 
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
