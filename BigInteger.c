@@ -339,7 +339,7 @@ int compare(BigInteger A, BigInteger B)
     }
     if ((sign(A) == sign(B)) == 0)
     {
-        return 0;
+        return 1;
     }
     if (length(A->mag) > length(B->mag))
     {

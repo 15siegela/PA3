@@ -29,7 +29,7 @@ int getCount(char *buf, FILE *in)
     }
     return 0;
 }
-
+//create a new bigInt from buf
 BigInteger createBigInt(char *buf, FILE *in)
 {
     if (fgets(buf, M_DATA_LEN, in) != NULL)
@@ -68,48 +68,60 @@ int main(int argc, char **argv)
         fprintf(stderr, "Unable to open file %s for writing\n", argv[2]);
         exit(1);
     }
-    BigInteger res = newBigInteger();
-    int digitsA = getCount(buf, in);
-    char aBuf[digitsA+1];
-    BigInteger A = createBigInt(aBuf, in);
-    printBigInteger(out, A);
-    int digitsB = getCount(buf, in);
-    char bBuf[digitsB+1];
-    BigInteger B = createBigInt(bBuf, in);
-    printBigInteger(out, B);
+
+    //start program
+    BigInteger res = newBigInteger(); //stores result
+    int digitsA = getCount(buf, in); //get count of first line
+    char aBuf[digitsA+1]; //create properly sized buf
+    BigInteger A = createBigInt(aBuf, in); //create bigint A
+    printBigInteger(out, A); //print A
+    
+    int digitsB = getCount(buf, in);//get count of second line
+    char bBuf[digitsB+1];//create properly sized buf
+    BigInteger B = createBigInt(bBuf, in);//create bigint B
+    printBigInteger(out, B);//Print B
+    
+    //A+B
     add(res, A, B);
-    printBigInteger(out, res);
+    printBigInteger(out, res); //Print A+B
+    //A-B
     subtract(res, A, B);
     printBigInteger(out, res);
+    //A-A
     subtract(res, A, A);
     printBigInteger(out, res);
+
+    //create copies
     BigInteger tempA = copy(A);
     BigInteger tempB = copy(B);
+    
+    //3*a -2*B 
     scalar(tempA, 3);
     scalar(tempB, 2);
-   
     subtract(res, tempA, tempB);
     printBigInteger(out, res);
     
+    //A*B
     multiply(res, A, B);
     printBigInteger(out, res);
     
-    
+    //A*A
     multiply(tempA, A, A);
     printBigInteger(out, tempA);
+    //B*B
     multiply(tempB, B, B);
     printBigInteger(out, tempB);
     
+    //9*A^4 + 16B^5
     multiply(tempA, tempA, tempA);
     scalar(tempA, 9);
-    
     multiply(tempB, tempB, tempB);
     multiply(tempB, tempB, B);
     scalar(tempB, 16);
-    
     add(res, tempA, tempB);
     printBigInteger(out, res);
 
+    //free memory
     freeBigInteger(&A);
     freeBigInteger(&B);
     freeBigInteger(&tempA);
