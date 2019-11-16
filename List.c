@@ -176,6 +176,7 @@ void clear(List L)
     delete(L);
     
   }
+  L->front = L->cursor = L->back = NULL;
   L->length = 0;
   L->index = -1;
 }

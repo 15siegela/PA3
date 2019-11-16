@@ -147,7 +147,7 @@ int negCheck(BigInteger A)
 {
     List L = A->mag;
     moveBack(L);
-    while (index(L) > -1)
+    while (index(L) > 0)
     {
         if (get(L) <= 0)
         {
@@ -158,23 +158,20 @@ int negCheck(BigInteger A)
             return -1;
         }
     }
+    
     scalar(A, -1);
-    negate(A);
     return 1;
 }
 
 void negNormalize(BigInteger A)
 {
     List L = A->mag;
-    if (A == NULL || L == NULL)
-    {
-        return;
-    }
-    if (negCheck(A) == -1)
+    int res = negCheck(A);
+    if (res == -1 && front(L) > 0)
     {
         moveBack(L);
         long carry = 0;
-        while (index(L) > -1)
+        while (index(L) >= 0)
         {
             if (carry) //if carry != 0
             {
@@ -184,17 +181,47 @@ void negNormalize(BigInteger A)
             if (val < 0)
             {
                 carry = -1;
-                set(L, val + 1 * BASE);
+                set(L, val + BASE);
                 movePrev(L);
                 continue;
             }
-            movePrev(L);
-            carry = 0;
+            else
+            {
+                movePrev(L);
+                carry = 0;
+            } 
         }
         if (carry)
         {
             negate(A);
         }
+    }
+    else if(res == -1)
+    {
+        moveBack(L);
+        long carry = 0;
+        while (index(L) >= 0)
+        {
+            if (carry) //if carry != 0
+            {
+                set(L, get(L) + carry); //apply carry
+            }
+            int val = get(L);
+            if (val > 0)
+            {
+                carry = 1;
+                set(L, 1 *(BASE - val));
+                movePrev(L);
+                continue;
+            }
+            else
+            {
+                set(L, -1*val);
+                movePrev(L);
+                carry = 0;
+            }
+        }
+        negate(A);
     }
     removeLeadZeros(A);
 }
@@ -487,7 +514,10 @@ void subtract(BigInteger D, BigInteger A, BigInteger B)
 {
     operate(D, A, B, -1);
     negNormalize(D);
-    normalize(D);
+    //normalize(D);
+   
+    
+    
 }
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
